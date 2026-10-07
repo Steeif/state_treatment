@@ -1,0 +1,16 @@
+{
+  "doctype": "DocType",
+  "name": "Recommendation Protocol Item",
+  "module": "State Treatment",
+  "custom": 0,
+  "istable": 1,
+  "fields": [
+    {"fieldname": "item", "fieldtype": "Link", "label": "Item", "options": "Item"},
+    {"fieldname": "item_name", "fieldtype": "Data", "label": "Item Name"},
+    {"fieldname": "rate", "fieldtype": "Currency", "label": "Rate"},
+    {"fieldname": "duration_days", "fieldtype": "Int", "label": "Duration (Days)"},
+    {"fieldname": "decision_sequence", "fieldtype": "Int", "label": "Decision Sequence"},
+    {"fieldname": "official_protocol_code", "fieldtype": "Data", "label": "Official Protocol Code"}
+  ],
+  "permissions": []
+}

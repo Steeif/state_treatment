@@ -1,0 +1,194 @@
+{
+ "doctype": "DocType",
+ "name": "State Treatment Recommendation",
+ "module": "State Treatment",
+ "custom": 0,
+ "istable": 0,
+ "is_submittable": 0,
+ "autoname": "",
+ "naming_rule": "",
+ "engine": "InnoDB",
+ "track_changes": 1,
+ "allow_copy": 0,
+ "allow_import": 1,
+ "show_name_in_global_search": 1,
+ "search_fields": "patient,recommendation_no,status,national_id",
+ "title_field": "recommendation_no",
+ "creation": "2026-10-07 02:00:00.000000",
+ "modified": "2026-10-07 02:00:00.000000",
+ "owner": "Administrator",
+ "fields": [
+  {
+   "fieldname": "patient_section",
+   "fieldtype": "Section Break",
+   "label": "بيانات المريض / Patient"
+  },
+  {
+   "fieldname": "national_id",
+   "fieldtype": "Data",
+   "label": "الرقم القومي / National ID"
+  },
+  {
+   "fieldname": "patient",
+   "fieldtype": "Link",
+   "label": "المريض / Patient",
+   "options": "Patient",
+   "reqd": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "recommendation_no",
+   "fieldtype": "Data",
+   "label": "رقم التوصية / Recommendation No."
+  },
+  {
+   "fieldname": "recommendation_year",
+   "fieldtype": "Data",
+   "label": "سنة التوصية / Recommendation Year"
+  },
+  {
+   "fieldname": "codes_section",
+   "fieldtype": "Section Break",
+   "label": "الأكواد / Codes"
+  },
+  {
+   "fieldname": "entry_code",
+   "fieldtype": "Data",
+   "label": "كود المدخل / Entry Code"
+  },
+  {
+   "fieldname": "reviewer_code",
+   "fieldtype": "Data",
+   "label": "كود المراجع / Reviewer Code"
+  },
+  {
+   "fieldname": "doctor_code",
+   "fieldtype": "Data",
+   "label": "كود الطبيب / Doctor Code"
+  },
+  {
+   "fieldname": "council_section",
+   "fieldtype": "Section Break",
+   "label": "بيانات المجلس / Council Data"
+  },
+  {
+   "fieldname": "council_recommendation_no",
+   "fieldtype": "Data",
+   "label": "رقم قرار المجلس / Council Recommendation No."
+  },
+  {
+   "fieldname": "council_recommendation_date",
+   "fieldtype": "Date",
+   "label": "تاريخ قرار المجلس / Council Recommendation Date"
+  },
+  {
+   "fieldname": "triple_committee_report_date",
+   "fieldtype": "Date",
+   "label": "تاريخ تقرير اللجنة الثلاثية / Triple Committee Report Date"
+  },
+  {
+   "fieldname": "system_registration_date",
+   "fieldtype": "Date",
+   "label": "تاريخ قيد النظام / System Registration Date"
+  },
+  {
+   "fieldname": "council_session_date",
+   "fieldtype": "Date",
+   "label": "تاريخ جلسة المجلس / Council Session Date"
+  },
+  {
+   "fieldname": "facility_section",
+   "fieldtype": "Section Break",
+   "label": "الجهة المنفذة / Executing Facility"
+  },
+  {
+   "fieldname": "executing_facility",
+   "fieldtype": "Link",
+   "label": "الجهة المنفذة / Executing Facility",
+   "options": "Healthcare Service Unit"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "الحالة / Status",
+   "options": "Draft\nUnder Committee Review\nAdministrative Letter\nRecommendation Approved\nFile Reviewed at Hospital\nApproved for Disbursement\nRejected",
+   "default": "Draft",
+   "read_only": 1,
+   "in_standard_filter": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "signers_section",
+   "fieldtype": "Section Break",
+   "label": "الموقّعون / Signers"
+  },
+  {
+   "fieldname": "admin_reviewer",
+   "fieldtype": "Data",
+   "label": "المراجع الإداري / Admin Reviewer"
+  },
+  {
+   "fieldname": "medical_reviewer",
+   "fieldtype": "Data",
+   "label": "المراجع الطبي / Medical Reviewer"
+  },
+  {
+   "fieldname": "general_manager",
+   "fieldtype": "Data",
+   "label": "المدير العام / General Manager"
+  },
+  {
+   "fieldname": "items_section",
+   "fieldtype": "Section Break",
+   "label": "بنود البروتوكول / Protocol Items"
+  },
+  {
+   "fieldname": "protocol_items",
+   "fieldtype": "Table",
+   "label": "بنود البروتوكول / Protocol Items",
+   "options": "Recommendation Protocol Item"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "الإجمالي / Total Amount",
+   "read_only": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "Admin Reviewer",
+   "read": 1,
+   "write": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Medical Reviewer",
+   "read": 1,
+   "write": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "General Manager",
+   "read": 1,
+   "write": 1,
+   "report": 1,
+   "export": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

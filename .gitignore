@@ -1,0 +1,4 @@
+state_treatment/data/breast_cancer_protocols.json
+__pycache__/
+*.pyc
+.vscode/

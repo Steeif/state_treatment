@@ -1,0 +1,5 @@
+[
+  {"doctype": "Role", "name": "Admin Reviewer", "role_name": "Admin Reviewer", "desk_access": 1},
+  {"doctype": "Role", "name": "Medical Reviewer", "role_name": "Medical Reviewer", "desk_access": 1},
+  {"doctype": "Role", "name": "General Manager", "role_name": "General Manager", "desk_access": 1}
+]
