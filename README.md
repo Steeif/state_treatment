@@ -48,15 +48,24 @@ Check that you are signed in with the right role and that the request is at the 
 
 ## For System Administrators
 
-### Requirements
+### Prerequisites
 
-This app is intended for:
+**Yes, Healthcare is required.** Install all three apps on the same Frappe site, in this order:
 
-- Frappe Framework v15.117.0
-- ERPNext v15.97.0
-- Healthcare v15.2.1
+1. Frappe Framework **v15.117.0**
+2. ERPNext **v15.97.0**
+3. Healthcare **v15.2.1**
+4. State Treatment
 
-The Healthcare app must provide the **Patient** and **Healthcare Service Unit** records used by this app.
+Before staff begin processing requests, make sure that:
+
+- Healthcare is installed and contains the patients who will be selected on requests. The **Patient** record is required for each request.
+- The relevant **Healthcare Service Unit** records exist for facilities selected on requests and administrative letters.
+- The authorized treatment catalog JSON file is available securely on the server and has been imported, creating the protocol items and their State-funded EGP prices. Do not put this restricted file in the public repository.
+- Staff have user accounts and have been assigned the appropriate **Admin Reviewer**, **Medical Reviewer**, or **General Manager** role. A System Manager can administer setup.
+- The ERPNext site is configured for the organization, including the company and any standard customer, accounting, and tax details needed to create its Sales Invoices.
+
+The catalog import creates the State-funded selling price list in EGP and the protocol items/prices. If catalog data or prices are unavailable, users will not be able to add treatment items to requests.
 
 ### Install
 
