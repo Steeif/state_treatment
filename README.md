@@ -1,69 +1,84 @@
-# state_treatment
+# State Treatment
 
-Frappe app for state-funded treatment recommendations. Target versions: Frappe Framework v15.117.0, ERPNext v15.97.0, and Healthcare v15.2.1.
+State Treatment helps a healthcare team manage requests for state-funded treatment in one place. Staff can record a request, follow it through review and approval, print its form, and link a Sales Invoice to the approved treatment items.
 
-## Install
+**It supports the administrative process; it does not recommend or decide medical treatment.**
 
-```bash
-bench --site [site-name] install-app state_treatment
-bench restart
-```
-
-The restricted protocol master data is intentionally excluded from Git. Installation does not require it. An authorized administrator must provision the JSON file on the server and import it explicitly after installation:
-
-```bash
-bench --site [site-name] execute state_treatment.patches.v1_0.import_breast_cancer_protocols.execute --kwargs '{"file_path":"/secure/path/breast_cancer_protocols.json"}'
-```
-
-The default file path is `state_treatment/data/breast_cancer_protocols.json`, which is ignored by Git. Do not commit the source data or patient records to this public repository.
-
-The app provides the State Treatment Recommendation, Recommendation Protocol Item, and Administrative Letter DocTypes; recommendation workflow and official print format fixtures; and Sales Invoice submission validation against approved recommendations. The linked Healthcare Service Unit DocType and Patient DocType must be available from the installed Healthcare app.
-
-## How It Works
-
-The app gives staff a shared case file for a state-funded treatment request. It records the request, tracks its review and approval stages, and helps ensure that a submitted sales invoice is tied to an approved recommendation. It supports administrative review; it does not choose treatment or make clinical decisions.
+## The Process at a Glance
 
 ```mermaid
 flowchart TD
-    A[Administrative Reviewer creates request for a patient] --> B[Medical Reviewer reviews the request]
-    B -->|More documents needed| C[Administrative Reviewer records a letter]
+    A[Administrative Reviewer creates a request] --> B[Medical Reviewer reviews it]
+    B -->|More information needed| C[Administrative Reviewer records a letter]
     C --> B
-    B -->|Committee review complete| D[General Manager records recommendation decision]
-    D -->|Approved| E[File reviewed at hospital]
-    E --> F[Approved for disbursement]
-    F --> G[Sales invoice submitted with approved items]
-    A -. Rejection may occur before final approval .-> R[Rejected]
+    B -->|Review complete| D[General Manager approves recommendation]
+    D --> E[Hospital file is reviewed]
+    E --> F[General Manager approves for disbursement]
+    F --> G[Sales Invoice submitted with approved items]
+    A -. A request may be rejected at an available stage .-> R[Rejected]
     B -.-> R
     C -.-> R
     D -.-> R
     E -.-> R
 ```
 
-## User Roles
+## Who Does What
 
-- **Administrative Reviewer:** Starts a request for an existing patient, enters its details, and records administrative letters when more documents are needed.
-- **Medical Reviewer:** Reviews the request at the committee stage and resumes the review when requested information is added.
-- **General Manager:** Records the recommendation decision and advances approved cases through hospital-file review and disbursement approval.
+- **Administrative Reviewer:** Creates the request for an existing patient, fills in its details, and records administrative letters when more information is needed.
+- **Medical Reviewer:** Reviews requests at the committee stage and resumes review after requested information is recorded.
+- **General Manager:** Makes the recommendation decision and moves approved requests through hospital-file review and disbursement approval.
 
-There is no separate Hospital role in this release; the hospital-file review is a workflow step handled by the General Manager role.
+In this release, hospital-file review is a step completed by the General Manager; there is no separate Hospital role.
 
-## Requests and Invoices
+## Using the System
 
-- Treatment items, codes, durations, and prices are selected from the protocol catalog. An authorized administrator must securely import the catalog before staff can use those options.
-- A sales invoice may be prepared earlier, but it can only be submitted when it is linked to an approved recommendation and contains items allowed by that recommendation.
-- The app includes a printable request form. Before production use, verify that its layout matches the official form on the target site.
+Before you begin, make sure the patient already exists in Healthcare and the system administrator has loaded the treatment catalog and its prices. Sign in with the role assigned to you. You will only see actions available to your role and the request's current stage.
 
-## Using the System Step by Step
+1. **Start a request.** Open **State Treatment Recommendation** and create a new request. Select the patient, enter the available recommendation, council, facility, date, and reviewer details, then add the treatment items. The item details and total are filled in from the catalog. Save the request; its first status is **Draft**.
+2. **Send it to committee review.** A Medical Reviewer opens the saved request and selects **Submit for Committee Review**. Its status becomes **Under Committee Review**.
+3. **Handle missing information.** If more information is needed, select **Request Administrative Letter**. An Administrative Reviewer creates an **Administrative Letter**, links it to the request, and fills in the requested details. The Medical Reviewer then reopens the request and selects **Resume Review**.
+4. **Record the decision.** When committee review is complete, the General Manager opens the request and selects **Approve Recommendation**. The General Manager may select **Reject** instead when rejection is available.
+5. **Finish the approval steps.** After the hospital-file review is complete, the General Manager selects **Review File at Hospital**. When ready, select **Approve for Disbursement**. The request status shows how far it has progressed.
+6. **Print the request, if needed.** Open the request and use **Print**. Check the printed form against the official form before using it operationally.
+7. **Prepare and submit an invoice.** Create a Sales Invoice and link it to the request using **State Treatment Recommendation**. Add only items listed on that request. You may prepare a draft invoice earlier, but it cannot be submitted until the request status is **Approved for Disbursement**.
 
-Before starting, sign in with the role assigned to your part of the process. The patient must already exist in Healthcare, and the administrator must have imported the authorized treatment catalog and set up its State-funded price list.
+### If You Cannot Find an Action
 
-1. **Create the request:** As an Administrative Reviewer, open **State Treatment Recommendation**, create a new record, select the patient, and enter the available recommendation, council, facility, date, and reviewer details. Add each treatment protocol item and check the automatically populated item information and total. Save the record; it starts in **Draft**.
-2. **Send it for committee review:** A Medical Reviewer opens the saved recommendation and chooses **Submit for Committee Review**. The status changes to **Under Committee Review**.
-3. **Request missing documents, if needed:** A Medical Reviewer chooses **Request Administrative Letter**. As an Administrative Reviewer, create an **Administrative Letter**, link it to the recommendation, and enter the request number, committee date, letter text, recipient facility, and issue date. After recording the requested information, the Medical Reviewer reopens the recommendation and chooses **Resume Review**.
-4. **Record the committee decision:** Once review is complete, the General Manager opens the recommendation and chooses **Approve Recommendation**. If it cannot proceed, the General Manager can choose **Reject** at an available stage before disbursement approval.
-5. **Complete the remaining approvals:** For an approved recommendation, the General Manager chooses **Review File at Hospital** after the hospital-file review is complete, then chooses **Approve for Disbursement** when ready. The recommendation status shows the current stage throughout.
-6. **Prepare and submit the invoice:** Create a Sales Invoice and link it to the recommendation using the **State Treatment Recommendation** field. Add only the protocol items listed on that recommendation. A draft invoice can be prepared earlier, but submission is allowed only after the recommendation reaches **Approved for Disbursement**.
-7. **Print the request when needed:** Open the recommendation and use the standard Print action to produce its printable form. Check the printed result against the official form before using it operationally.
+Check that you are signed in with the right role and that the request is at the correct stage. If a patient, treatment item, or price is missing, contact your system administrator.
 
-If an expected workflow action is missing, check that you are signed in with the role allowed to perform that transition and that the recommendation is currently at the correct stage. Contact the system administrator if the patient, treatment catalog, or required price list is unavailable.
+## For System Administrators
+
+### Requirements
+
+This app is intended for:
+
+- Frappe Framework v15.117.0
+- ERPNext v15.97.0
+- Healthcare v15.2.1
+
+The Healthcare app must provide the **Patient** and **Healthcare Service Unit** records used by this app.
+
+### Install
+
+```bash
+bench --site [site-name] install-app state_treatment
+bench restart
+```
+
+### Load the Treatment Catalog
+
+The treatment catalog is restricted data and is intentionally not included in this public repository. Installation does not load it. An authorized administrator must securely provision the JSON file on the server and import it after installation:
+
+```bash
+bench --site [site-name] execute state_treatment.patches.v1_0.import_breast_cancer_protocols.execute --kwargs '{"file_path":"/secure/path/breast_cancer_protocols.json"}'
+```
+
+The default file path is `state_treatment/data/breast_cancer_protocols.json`; that file is ignored by Git. The catalog and patient records must not be committed to this repository. The administrator must also configure the State-funded price list. Without the catalog and prices, staff cannot add protocol items to requests.
+
+## What the App Includes
+
+- A request record with a tracked approval workflow.
+- Administrative letters linked to requests.
+- A printable request form. Confirm its layout matches the official form on the target site before production use.
+- A Sales Invoice check that requires an approved-for-disbursement request and limits invoice items to those on that request.
 
