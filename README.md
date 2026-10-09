@@ -4,22 +4,47 @@ State Treatment helps a healthcare team manage requests for state-funded treatme
 
 **It supports the administrative process; it does not recommend or decide medical treatment.**
 
-## The Process at a Glance
+## How a Request Moves Through the System
 
 ```mermaid
 flowchart TD
-    A[Administrative Reviewer creates a request] --> B[Medical Reviewer reviews it]
-    B -->|More information needed| C[Administrative Reviewer records a letter]
-    C --> B
-    B -->|Review complete| D[General Manager approves recommendation]
-    D --> E[Hospital file is reviewed]
-    E --> F[General Manager approves for disbursement]
-    F --> G[Sales Invoice submitted with approved items]
-    A -. A request may be rejected at an available stage .-> R[Rejected]
-    B -.-> R
-    C -.-> R
-    D -.-> R
-    E -.-> R
+    P["Before staff start: install Frappe, ERPNext, Healthcare, and State Treatment; assign user roles; add patients and facilities; import the private treatment catalog"] --> A["Admin Reviewer: create State Treatment Recommendation; select patient; add protocol items; save"]
+    A --> D["Status: Draft"]
+    D --> M["Medical Reviewer: Submit for Committee Review"]
+    M --> U["Status: Under Committee Review"]
+    U --> Q{"More information needed?"}
+    Q -->|Yes| L["Admin Reviewer: Request Administrative Letter"]
+    L --> LA["Status: Administrative Letter; create and link the letter"]
+    LA --> MR["Medical Reviewer: Resume Review"]
+    MR --> U
+    Q -->|No, committee review complete| G["General Manager: Approve Recommendation"]
+    G --> R["Status: Recommendation Approved"]
+    R --> H["Hospital file review happens"]
+    H --> HA["General Manager: Review File at Hospital"]
+    HA --> HF["Status: File Reviewed at Hospital"]
+    HF --> GD["General Manager: Approve for Disbursement"]
+    GD --> F["Status: Approved for Disbursement"]
+    F --> I["Create or open Sales Invoice; link the recommendation; use only its approved protocol items"]
+    I --> S["Submit linked invoice: allowed only when status is Approved for Disbursement and items match"]
+    D -. General Manager can reject .-> X["Status: Rejected"]
+    U -. General Manager can reject .-> X
+    LA -. General Manager can reject .-> X
+    R -. General Manager can reject .-> X
+    HF -. General Manager can reject .-> X
+    classDef setup fill:#f1f5f9,stroke:#64748b,color:#0f172a
+    classDef admin fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+    classDef medical fill:#dcfce7,stroke:#16a34a,color:#14532d
+    classDef manager fill:#fef3c7,stroke:#d97706,color:#78350f
+    classDef status fill:#f8fafc,stroke:#475569,color:#0f172a
+    classDef decision fill:#fff7ed,stroke:#ea580c,color:#7c2d12
+    classDef invoice fill:#ecfccb,stroke:#65a30d,color:#365314
+    class P setup
+    class A,L,LA admin
+    class M,MR medical
+    class G,HA,GD manager
+    class D,U,R,HF,F,X status
+    class Q decision
+    class I,S invoice
 ```
 
 ## Who Does What
@@ -36,7 +61,7 @@ Before you begin, make sure the patient already exists in Healthcare and the sys
 
 1. **Start a request.** Open **State Treatment Recommendation** and create a new request. Select the patient, enter the available recommendation, council, facility, date, and reviewer details, then add the treatment items. The item details and total are filled in from the catalog. Save the request; its first status is **Draft**.
 2. **Send it to committee review.** A Medical Reviewer opens the saved request and selects **Submit for Committee Review**. Its status becomes **Under Committee Review**.
-3. **Handle missing information.** If more information is needed, select **Request Administrative Letter**. An Administrative Reviewer creates an **Administrative Letter**, links it to the request, and fills in the requested details. The Medical Reviewer then reopens the request and selects **Resume Review**.
+3. **Handle missing information.** If more information is needed, an Administrative Reviewer selects **Request Administrative Letter**, then creates an **Administrative Letter**, links it to the request, and fills in the requested details. The Medical Reviewer then reopens the request and selects **Resume Review**.
 4. **Record the decision.** When committee review is complete, the General Manager opens the request and selects **Approve Recommendation**. The General Manager may select **Reject** instead when rejection is available.
 5. **Finish the approval steps.** After the hospital-file review is complete, the General Manager selects **Review File at Hospital**. When ready, select **Approve for Disbursement**. The request status shows how far it has progressed.
 6. **Print the request, if needed.** Open the request and use **Print**. Check the printed form against the official form before using it operationally.
