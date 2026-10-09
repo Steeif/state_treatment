@@ -52,6 +52,41 @@ flowchart TD
 
 At certain stages before disbursement approval, the General Manager can choose **Reject** instead. A draft invoice may be prepared earlier, but do not submit it until the request is approved for disbursement.
 
+### Practical Graph: Forms, Information, and Actions
+
+```mermaid
+flowchart TD
+    A["DocType: State Treatment Recommendation<br/>Enter patient, recommendation and council details, dates, codes, and facility"]
+    A --> B["Protocol Items table<br/>Choose each Item from the catalog<br/>Name, protocol code, duration, and price fill in automatically"]
+    B --> C["Save the request<br/>Status: Draft"]
+    C --> D["Action: Submit for Committee Review<br/>Role: Medical Reviewer"]
+    D --> E["Status: Under Committee Review"]
+    E --> Q{"More information needed?"}
+    Q -->|Yes| F["Action: Request Administrative Letter<br/>Role: Admin Reviewer"]
+    F --> G["DocType: Administrative Letter<br/>Enter linked recommendation, request number, committee date, letter text, recipient facility, and issue date"]
+    G --> H["Action: Resume Review<br/>Role: Medical Reviewer"]
+    H --> E
+    Q -->|No| I["Action: Approve Recommendation<br/>Role: General Manager"]
+    I --> J["Status: Recommendation Approved"]
+    J --> K["Hospital file is checked"]
+    K --> L["Action: Review File at Hospital<br/>Role: General Manager"]
+    L --> M["Status: File Reviewed at Hospital"]
+    M --> N["Action: Approve for Disbursement<br/>Role: General Manager"]
+    N --> O["Status: Approved for Disbursement"]
+    O --> P["DocType: Sales Invoice<br/>Link the State Treatment Recommendation<br/>Use only items on that recommendation"]
+    P --> R["Submit invoice<br/>The app checks approval status and item list"]
+    classDef form fill:#dbeafe,stroke:#2563eb,color:#172554
+    classDef action fill:#dcfce7,stroke:#16a34a,color:#14532d
+    classDef status fill:#f1f5f9,stroke:#64748b,color:#0f172a
+    classDef question fill:#ffedd5,stroke:#ea580c,color:#7c2d12
+    classDef invoice fill:#ecfccb,stroke:#65a30d,color:#365314
+    class A,B,G,P form
+    class D,F,H,I,L,N action
+    class C,E,J,M,O status
+    class Q question
+    class R invoice
+```
+
 1. **Start a request.** Open **State Treatment Recommendation** and create a new request. Select the patient, enter the available recommendation, council, facility, date, and reviewer details, then add the treatment items. The item details and total are filled in from the catalog. Save the request; its first status is **Draft**.
 2. **Send it to committee review.** A Medical Reviewer opens the saved request and selects **Submit for Committee Review**. Its status becomes **Under Committee Review**.
 3. **Handle missing information.** If more information is needed, an Administrative Reviewer selects **Request Administrative Letter**, then creates an **Administrative Letter**, links it to the request, and fills in the requested details. The Medical Reviewer then reopens the request and selects **Resume Review**.
