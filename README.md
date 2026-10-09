@@ -20,44 +20,37 @@ Before you begin, make sure the patient already exists in Healthcare and the sys
 
 ```mermaid
 flowchart TD
-    P["Before staff start: install Frappe, ERPNext, Healthcare, and State Treatment; assign user roles; add patients and facilities; import the private treatment catalog"] --> A["Admin Reviewer: create State Treatment Recommendation; select patient; add protocol items; save"]
-    A --> D["Status: Draft"]
-    D --> M["Medical Reviewer: Submit for Committee Review"]
-    M --> U["Status: Under Committee Review"]
-    U --> Q{"More information needed?"}
-    Q -->|Yes| L["Admin Reviewer: Request Administrative Letter"]
-    L --> LA["Status: Administrative Letter; create and link the letter"]
-    LA --> MR["Medical Reviewer: Resume Review"]
-    MR --> U
-    Q -->|No, committee review complete| G["General Manager: Approve Recommendation"]
-    G --> R["Status: Recommendation Approved"]
-    R --> H["Hospital file review happens"]
-    H --> HA["General Manager: Review File at Hospital"]
-    HA --> HF["Status: File Reviewed at Hospital"]
-    HF --> GD["General Manager: Approve for Disbursement"]
-    GD --> F["Status: Approved for Disbursement"]
-    F --> I["Create or open Sales Invoice; link the recommendation; use only its approved protocol items"]
-    I --> S["Submit linked invoice: allowed only when status is Approved for Disbursement and items match"]
-    D -. General Manager can reject .-> X["Status: Rejected"]
-    U -. General Manager can reject .-> X
-    LA -. General Manager can reject .-> X
-    R -. General Manager can reject .-> X
-    HF -. General Manager can reject .-> X
-    classDef setup fill:#f1f5f9,stroke:#64748b,color:#0f172a
-    classDef admin fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+    A([Start]) --> B["1. Admin Reviewer<br/>Open State Treatment Recommendation<br/>Choose New"]
+    B --> C["Choose the patient<br/>Add treatment items<br/>Save the request"]
+    C --> D["Saved as Draft"]
+    D --> E["2. Medical Reviewer<br/>Choose Submit for Committee Review"]
+    E --> F["Request is in committee review"]
+    F --> Q{"Need more information?"}
+    Q -->|Yes| G["3. Admin Reviewer<br/>Choose Request Administrative Letter<br/>Create and link the letter"]
+    G --> H["Medical Reviewer<br/>Choose Resume Review"]
+    H --> F
+    Q -->|No| I["4. General Manager<br/>Choose Approve Recommendation"]
+    I --> J["Hospital file is checked"]
+    J --> K["5. General Manager<br/>Choose Review File at Hospital"]
+    K --> L["General Manager<br/>Choose Approve for Disbursement"]
+    L --> M["6. Sales Invoice<br/>Link the request<br/>Use only items on that request"]
+    M --> N["Submit the invoice<br/>Only after disbursement approval"]
+    classDef start fill:#f1f5f9,stroke:#64748b,color:#0f172a
+    classDef admin fill:#dbeafe,stroke:#2563eb,color:#172554
     classDef medical fill:#dcfce7,stroke:#16a34a,color:#14532d
     classDef manager fill:#fef3c7,stroke:#d97706,color:#78350f
-    classDef status fill:#f8fafc,stroke:#475569,color:#0f172a
-    classDef decision fill:#fff7ed,stroke:#ea580c,color:#7c2d12
+    classDef question fill:#ffedd5,stroke:#ea580c,color:#7c2d12
     classDef invoice fill:#ecfccb,stroke:#65a30d,color:#365314
-    class P setup
-    class A,L,LA admin
-    class M,MR medical
-    class G,HA,GD manager
-    class D,U,R,HF,F,X status
-    class Q decision
-    class I,S invoice
+    class A start
+    class B,C,G admin
+    class E,H medical
+    class I,J,K,L manager
+    class F,D start
+    class Q question
+    class M,N invoice
 ```
+
+At certain stages before disbursement approval, the General Manager can choose **Reject** instead. A draft invoice may be prepared earlier, but do not submit it until the request is approved for disbursement.
 
 1. **Start a request.** Open **State Treatment Recommendation** and create a new request. Select the patient, enter the available recommendation, council, facility, date, and reviewer details, then add the treatment items. The item details and total are filled in from the catalog. Save the request; its first status is **Draft**.
 2. **Send it to committee review.** A Medical Reviewer opens the saved request and selects **Submit for Committee Review**. Its status becomes **Under Committee Review**.
