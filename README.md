@@ -4,7 +4,19 @@ State Treatment helps a healthcare team manage requests for state-funded treatme
 
 **It supports the administrative process; it does not recommend or decide medical treatment.**
 
-## How a Request Moves Through the System
+## Who Does What
+
+- **Administrative Reviewer:** Creates the request for an existing patient, fills in its details, and records administrative letters when more information is needed.
+- **Medical Reviewer:** Reviews requests at the committee stage and resumes review after requested information is recorded.
+- **General Manager:** Makes the recommendation decision and moves approved requests through hospital-file review and disbursement approval.
+
+In this release, hospital-file review is a step completed by the General Manager; there is no separate Hospital role.
+
+## Using the System
+
+Before you begin, make sure the patient already exists in Healthcare and the system administrator has loaded the treatment catalog and its prices. Sign in with the role assigned to you. You will only see actions available to your role and the request's current stage.
+
+### Workflow Graph
 
 ```mermaid
 flowchart TD
@@ -46,18 +58,6 @@ flowchart TD
     class Q decision
     class I,S invoice
 ```
-
-## Who Does What
-
-- **Administrative Reviewer:** Creates the request for an existing patient, fills in its details, and records administrative letters when more information is needed.
-- **Medical Reviewer:** Reviews requests at the committee stage and resumes review after requested information is recorded.
-- **General Manager:** Makes the recommendation decision and moves approved requests through hospital-file review and disbursement approval.
-
-In this release, hospital-file review is a step completed by the General Manager; there is no separate Hospital role.
-
-## Using the System
-
-Before you begin, make sure the patient already exists in Healthcare and the system administrator has loaded the treatment catalog and its prices. Sign in with the role assigned to you. You will only see actions available to your role and the request's current stage.
 
 1. **Start a request.** Open **State Treatment Recommendation** and create a new request. Select the patient, enter the available recommendation, council, facility, date, and reviewer details, then add the treatment items. The item details and total are filled in from the catalog. Save the request; its first status is **Draft**.
 2. **Send it to committee review.** A Medical Reviewer opens the saved request and selects **Submit for Committee Review**. Its status becomes **Under Committee Review**.
