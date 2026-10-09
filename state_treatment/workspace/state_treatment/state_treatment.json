@@ -1,0 +1,53 @@
+{
+  "doctype": "Workspace",
+  "name": "State Treatment",
+  "label": "State Treatment",
+  "title": "State Treatment",
+  "module": "State Treatment",
+  "icon": "heart",
+  "public": 1,
+  "is_hidden": 0,
+  "hide_custom": 0,
+  "parent_page": "",
+  "sequence_id": 10,
+  "for_user": "",
+  "roles": [
+    { "role": "Admin Reviewer" },
+    { "role": "Medical Reviewer" },
+    { "role": "General Manager" },
+    { "role": "System Manager" }
+  ],
+  "shortcuts": [
+    {
+      "label": "New Treatment Request",
+      "type": "DocType",
+      "link_to": "State Treatment Recommendation",
+      "doc_view": "New"
+    },
+    {
+      "label": "Treatment Requests",
+      "type": "DocType",
+      "link_to": "State Treatment Recommendation",
+      "doc_view": "List"
+    },
+    {
+      "label": "Administrative Letters",
+      "type": "DocType",
+      "link_to": "Administrative Letter",
+      "doc_view": "List"
+    },
+    {
+      "label": "Treatment Protocol Items",
+      "type": "DocType",
+      "link_to": "Item",
+      "doc_view": "List"
+    }
+  ],
+  "content": "[{\"id\":\"st_quick_access\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Quick Access</b></span>\",\"col\":12}},{\"id\":\"st_new_request\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Treatment Request\",\"col\":3}},{\"id\":\"st_requests\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Treatment Requests\",\"col\":3}},{\"id\":\"st_letters\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Administrative Letters\",\"col\":3}},{\"id\":\"st_protocol_items\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Treatment Protocol Items\",\"col\":3}}]",
+  "links": [],
+  "charts": [],
+  "number_cards": [],
+  "quick_lists": [],
+  "custom_blocks": []
+}
+
