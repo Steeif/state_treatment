@@ -50,12 +50,13 @@ Check that you are signed in with the right role and that the request is at the 
 
 ### Prerequisites
 
-**Yes, Healthcare is required.** Install all three apps on the same Frappe site, in this order:
+**Yes, Healthcare is required.** Before installing State Treatment, install these platform apps on the same Frappe site, in this order:
 
 1. Frappe Framework **v15.117.0**
 2. ERPNext **v15.97.0**
 3. Healthcare **v15.2.1**
-4. State Treatment
+
+State Treatment is the app documented in this repository, not a prerequisite. Install it after the three platform apps using the command below.
 
 Before staff begin processing requests, make sure that:
 
