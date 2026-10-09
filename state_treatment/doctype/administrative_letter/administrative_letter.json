@@ -1,0 +1,21 @@
+{
+  "doctype": "DocType",
+  "name": "Administrative Letter",
+  "module": "State Treatment",
+  "custom": 0,
+  "autoname": "hash",
+  "fields": [
+    {"fieldname": "recommendation", "fieldtype": "Link", "label": "Recommendation", "options": "State Treatment Recommendation"},
+    {"fieldname": "request_no", "fieldtype": "Data", "label": "Request No."},
+    {"fieldname": "committee_date", "fieldtype": "Date", "label": "Committee Date"},
+    {"fieldname": "letter_text", "fieldtype": "Text", "label": "Letter Text"},
+    {"fieldname": "sent_to", "fieldtype": "Link", "label": "Sent To", "options": "Healthcare Service Unit"},
+    {"fieldname": "issue_date", "fieldtype": "Date", "label": "Issue Date"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "print": 1},
+    {"role": "Admin Reviewer", "read": 1, "write": 1, "create": 1, "print": 1},
+    {"role": "Medical Reviewer", "read": 1, "print": 1},
+    {"role": "General Manager", "read": 1, "print": 1}
+  ]
+}

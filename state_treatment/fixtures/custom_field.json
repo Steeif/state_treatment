@@ -1,0 +1,13 @@
+[
+  {
+    "doctype": "Custom Field",
+    "name": "Sales Invoice-state_treatment_recommendation",
+    "dt": "Sales Invoice",
+    "fieldname": "state_treatment_recommendation",
+    "label": "State Treatment Recommendation",
+    "fieldtype": "Link",
+    "options": "State Treatment Recommendation",
+    "insert_after": "customer",
+    "module": "State Treatment"
+  }
+]

@@ -1,0 +1,115 @@
+[
+ {
+  "doctype": "Workflow",
+  "name": "State Treatment Recommendation Workflow",
+  "document_type": "State Treatment Recommendation",
+  "workflow_state_field": "status",
+  "is_active": 1,
+  "send_email_alert": 1,
+  "states": [
+   {
+    "state": "Draft",
+    "doc_status": "0",
+    "allow_edit": "Admin Reviewer"
+   },
+   {
+    "state": "Under Committee Review",
+    "doc_status": "0",
+    "allow_edit": "Medical Reviewer"
+   },
+   {
+    "state": "Administrative Letter",
+    "doc_status": "0",
+    "allow_edit": "Admin Reviewer"
+   },
+   {
+    "state": "Recommendation Approved",
+    "doc_status": "0",
+    "allow_edit": "General Manager"
+   },
+   {
+    "state": "File Reviewed at Hospital",
+    "doc_status": "0",
+    "allow_edit": "General Manager"
+   },
+   {
+    "state": "Approved for Disbursement",
+    "doc_status": "0",
+    "allow_edit": "General Manager"
+   },
+   {
+    "state": "Rejected",
+    "doc_status": "0",
+    "allow_edit": "General Manager"
+   }
+  ],
+  "transitions": [
+   {
+    "state": "Draft",
+    "action": "Submit for Committee Review",
+    "next_state": "Under Committee Review",
+    "allowed": "Medical Reviewer"
+   },
+   {
+    "state": "Draft",
+    "action": "Reject",
+    "next_state": "Rejected",
+    "allowed": "General Manager"
+   },
+   {
+    "state": "Under Committee Review",
+    "action": "Request Administrative Letter",
+    "next_state": "Administrative Letter",
+    "allowed": "Admin Reviewer"
+   },
+   {
+    "state": "Administrative Letter",
+    "action": "Resume Review",
+    "next_state": "Under Committee Review",
+    "allowed": "Medical Reviewer"
+   },
+   {
+    "state": "Under Committee Review",
+    "action": "Approve Recommendation",
+    "next_state": "Recommendation Approved",
+    "allowed": "General Manager"
+   },
+   {
+    "state": "Under Committee Review",
+    "action": "Reject",
+    "next_state": "Rejected",
+    "allowed": "General Manager"
+   },
+   {
+    "state": "Recommendation Approved",
+    "action": "Review File at Hospital",
+    "next_state": "File Reviewed at Hospital",
+    "allowed": "General Manager"
+   },
+   {
+    "state": "Recommendation Approved",
+    "action": "Reject",
+    "next_state": "Rejected",
+    "allowed": "General Manager"
+   },
+   {
+    "state": "File Reviewed at Hospital",
+    "action": "Approve for Disbursement",
+    "next_state": "Approved for Disbursement",
+    "allowed": "General Manager"
+   },
+   {
+    "state": "File Reviewed at Hospital",
+    "action": "Reject",
+    "next_state": "Rejected",
+    "allowed": "General Manager"
+   },
+   {
+    "state": "Administrative Letter",
+    "action": "Reject",
+    "next_state": "Rejected",
+    "allowed": "General Manager"
+   }
+  ]
+ }
+]
