@@ -4,6 +4,24 @@ frappe.ui.form.on("State Treatment Recommendation", {
         if (frm.doc.docstatus === 0) {
             frm.set_df_property("status", "read_only", 1);
         }
+
+        const grid = frm.fields_dict.treatment_doses && frm.fields_dict.treatment_doses.grid;
+        if (grid) {
+            const roles = frappe.user_roles || [];
+            const is_pharmacist = roles.includes("Treatment Pharmacist");
+            const is_system_manager = roles.includes("System Manager");
+            const can_dispense = is_pharmacist || is_system_manager;
+
+            grid.update_docfield_property("dispensed", "read_only", !can_dispense);
+            if (is_pharmacist && !is_system_manager) {
+                ["item", "dose", "scheduled_date"].forEach((fieldname) => {
+                    grid.update_docfield_property(fieldname, "read_only", 1);
+                });
+                grid.cannot_add_rows = true;
+                grid.cannot_delete_rows = true;
+            }
+            grid.refresh();
+        }
     },
 });
 

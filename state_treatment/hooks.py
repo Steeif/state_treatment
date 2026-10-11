@@ -14,7 +14,7 @@ doc_events = {
 
 fixtures = [
     {"dt": "Custom Field", "filters": [["name", "in", ["Sales Invoice-state_treatment_recommendation"]]]},
-    {"dt": "Role", "filters": [["name", "in", ["Admin Reviewer", "Medical Reviewer", "General Manager"]]]},
+    {"dt": "Role", "filters": [["name", "in", ["Admin Reviewer", "Medical Reviewer", "General Manager", "Treatment Pharmacist"]]]},
     {"dt": "Workflow", "filters": [["name", "=", "State Treatment Recommendation Workflow"]]},
     {"dt": "Print Format", "filters": [["name", "=", "Recommendation Official Form"]]},
 ]

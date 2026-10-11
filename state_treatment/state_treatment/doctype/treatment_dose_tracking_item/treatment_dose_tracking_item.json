@@ -1,0 +1,18 @@
+{
+ "doctype": "DocType",
+ "name": "Treatment Dose Tracking Item",
+ "module": "State Treatment",
+ "custom": 0,
+ "istable": 1,
+ "editable_grid": 1,
+ "track_changes": 1,
+ "fields": [
+  {"fieldname": "item", "fieldtype": "Link", "label": "Medicine / Treatment", "options": "Item", "reqd": 1, "in_list_view": 1},
+  {"fieldname": "dose", "fieldtype": "Data", "label": "Prescribed Dose", "reqd": 1, "in_list_view": 1},
+  {"fieldname": "scheduled_date", "fieldtype": "Date", "label": "Scheduled Date", "reqd": 1, "in_list_view": 1},
+  {"fieldname": "dispensed", "fieldtype": "Check", "label": "Dispensed", "default": "0", "read_only": 1, "in_list_view": 1},
+  {"fieldname": "dispensed_by", "fieldtype": "Link", "label": "Dispensed By", "options": "User", "read_only": 1},
+  {"fieldname": "dispensed_on", "fieldtype": "Datetime", "label": "Dispensed On", "read_only": 1}
+ ],
+ "permissions": []
+}

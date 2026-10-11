@@ -97,17 +97,6 @@
    "label": "تاريخ جلسة المجلس / Council Session Date"
   },
   {
-   "fieldname": "facility_section",
-   "fieldtype": "Section Break",
-   "label": "الجهة المنفذة / Executing Facility"
-  },
-  {
-   "fieldname": "executing_facility",
-   "fieldtype": "Link",
-   "label": "الجهة المنفذة / Executing Facility",
-   "options": "Healthcare Service Unit"
-  },
-  {
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "الحالة / Status",
@@ -163,6 +152,17 @@
    "label": "الإجمالي / Total Amount",
    "options": "currency",
    "read_only": 1
+  },
+  {
+   "fieldname": "treatment_tracking_tab",
+   "fieldtype": "Tab Break",
+   "label": "Treatment Tracking"
+  },
+  {
+   "fieldname": "treatment_doses",
+   "fieldtype": "Table",
+   "label": "Treatment Dose Schedule",
+   "options": "Treatment Dose Tracking Item"
   }
  ],
  "permissions": [
@@ -192,6 +192,12 @@
   },
   {
    "role": "General Manager",
+   "read": 1,
+   "write": 1,
+   "print": 1
+  },
+  {
+   "role": "Treatment Pharmacist",
    "read": 1,
    "write": 1,
    "print": 1
