@@ -2,10 +2,11 @@
  {
   "doctype": "Workflow",
   "name": "State Treatment Recommendation Workflow",
+  "workflow_name": "State Treatment Recommendation Workflow",
   "document_type": "State Treatment Recommendation",
   "workflow_state_field": "status",
   "is_active": 1,
-  "send_email_alert": 1,
+  "send_email_alert": 0,
   "states": [
    {
     "state": "Draft",
