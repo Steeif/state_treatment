@@ -6,7 +6,18 @@ app_email = ""
 app_license = "MIT"
 required_apps = ["erpnext", "healthcare"]
 
+after_migrate = ["state_treatment.item_protocol.ensure_item_protocol_fields"]
+
+doctype_js = {
+    "Item": "public/js/item.js",
+}
+
 doc_events = {
+    "Item": {
+        "before_validate": "state_treatment.item_protocol.validate_protocol_item",
+        "after_insert": "state_treatment.item_protocol.sync_protocol_price",
+        "on_update": "state_treatment.item_protocol.sync_protocol_price",
+    },
     "Sales Invoice": {
         "before_submit": "state_treatment.sales_invoice.validate_sales_invoice",
     }
