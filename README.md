@@ -115,11 +115,11 @@ Before staff begin processing requests, make sure that:
 
 - Healthcare is installed and contains the patients who will be selected on requests. The **Patient** record is required for each request.
 - The relevant **Healthcare Service Unit** records exist for facilities selected on requests and administrative letters.
-- The authorized treatment catalog JSON file is available securely on the server and has been imported, creating the protocol items and their State-funded EGP prices. Do not put this restricted file in the public repository.
+- Protocol Items and their State-funded EGP prices have been entered manually, or an authorized catalog has been provisioned securely. Restricted protocol data must not be committed to the public repository.
 - Staff have user accounts and have been assigned the appropriate **Admin Reviewer**, **Medical Reviewer**, or **General Manager** role. A System Manager can administer setup.
 - The ERPNext site is configured for the organization, including the company and any standard customer, accounting, and tax details needed to create its Sales Invoices.
 
-The catalog import creates the State-funded selling price list in EGP and the protocol items/prices. If catalog data or prices are unavailable, users will not be able to add treatment items to requests.
+The State-funded selling price list must use EGP and each protocol Item must have a price in that list. Protocol Items can be entered manually from Item; no catalog data file is required for manual entry.
 
 ### Install
 
@@ -140,9 +140,9 @@ The default file path is `state_treatment/data/breast_cancer_protocols.json`; th
 
 ## Protocol Items
 
-Create protocol records from **Item**. Check **Is Protocol** to show the protocol fields, then choose **Medicine** or **Procedure** to show the matching section. The Item name is the treatment or procedure name. Ministry code, period duration, schedule, dose count, notes, and serial are stored on the Item. Internal protocol code is built from the ministry code, treatment type, and serial. For medicine protocols, the interval is calculated as period duration divided by dose count; procedure time follows the period duration when it is non-zero.
+Create protocol records manually from **Item**. Check **Is Protocol**, then choose **Medicine** or **Procedure**. Medicine records show a required medicine name, treatment duration, and dose count; the dose interval is calculated as duration divided by dose count. Procedure records show the procedure schedule, and duration is not required or used. The Item name can identify the regimen or procedure. Ministry code, notes, and a serial number are stored on the Item. The internal code is built from ministry code, treatment type, and serial.
 
-Protocol price is stored on the Item and synchronized to the **نفقة الدولة** selling price list in EGP so invoices continue to use the ERPNext Item Price. Existing imported protocol catalog Items are exposed as protocol records during migration.
+Protocol price is stored on the Item and synchronized to the **نفقة الدولة** selling price list in EGP so invoices continue to use ERPNext Item Price. Existing imported catalog Items are exposed as protocol records during migration.
 
 ## What the App Includes
 
