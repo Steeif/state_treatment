@@ -31,8 +31,11 @@ frappe.ui.form.on("Item", {
 });
 
 function update_protocol_code(frm) {
-    if (!frm.doc.is_protocol || !frm.doc.official_protocol_code || !frm.doc.protocol_serial) {
-        frm.set_value("internal_protocol_code", "");
+    if (!frm.doc.is_protocol || !frm.doc.official_protocol_code || !frm.doc.protocol_serial
+        || !["Medicine", "Procedure"].includes(frm.doc.protocol_treatment_type)) {
+        if (frm.doc.internal_protocol_code) {
+            frm.set_value("internal_protocol_code", "");
+        }
         return;
     }
 
@@ -45,6 +48,10 @@ function update_protocol_code(frm) {
 }
 
 function calculate_dose_interval(frm) {
+    if (frm.doc.protocol_treatment_type === "Procedure") {
+        frm.set_value("procedure_time_days", flt(frm.doc.duration_days) || 0);
+        return;
+    }
     if (frm.doc.protocol_treatment_type !== "Medicine") {
         return;
     }
