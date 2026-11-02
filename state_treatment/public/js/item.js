@@ -48,10 +48,6 @@ function update_protocol_code(frm) {
 }
 
 function calculate_dose_interval(frm) {
-    if (frm.doc.protocol_treatment_type === "Procedure") {
-        frm.set_value("procedure_time_days", flt(frm.doc.duration_days) || 0);
-        return;
-    }
     if (frm.doc.protocol_treatment_type !== "Medicine") {
         return;
     }
