@@ -35,7 +35,7 @@ ITEM_CUSTOM_FIELDS = [
         "fieldname": "protocol_treatment_type",
         "label": "نوع العلاج / Treatment Type",
         "fieldtype": "Select",
-        "options": "Medicine\\nProcedure",
+        "options": "Medicine\nProcedure",
         "insert_after": "protocol_section",
         "depends_on": "eval:doc.is_protocol",
     },
@@ -177,6 +177,7 @@ def backfill_existing_protocol_items():
             "protocol_treatment_type",
             "internal_protocol_code",
             "protocol_price",
+            "procedure_time_days",
         ],
     )
     for item in items:
@@ -195,6 +196,7 @@ def backfill_existing_protocol_items():
             "protocol_treatment_type": item.protocol_treatment_type or "Procedure",
             "protocol_serial": serial,
             "internal_protocol_code": item.internal_protocol_code or internal_code,
+            "procedure_time_days": cint(item.duration_days) if cint(item.duration_days) else 0,
         }
         price = frappe.db.get_value(
             "Item Price",
