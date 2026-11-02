@@ -140,7 +140,7 @@ The default file path is `state_treatment/data/breast_cancer_protocols.json`; th
 
 ## Protocol Items
 
-Create protocol records manually from **Item**. Check **Is Protocol**, then choose **Medicine** or **Procedure**. Medicine records show a required medicine name, treatment duration, and dose count; the dose interval is calculated as duration divided by dose count. Procedure records show the procedure schedule, and duration is not required or used. The Item name can identify the regimen or procedure. Ministry code, notes, and a serial number are stored on the Item. The internal code is built from ministry code, treatment type, and serial.
+Create protocol records manually from **Item**. Check **Is Protocol**, then choose **Medicine** or **Procedure**. Medicine records show a required medicine name, treatment duration, and dose count; the dose interval is calculated as duration divided by dose count. The medicine name is copied to the treatment dose schedule for pharmacy staff. Procedure records show the procedure schedule, and duration is not required or used. The Item name can identify the regimen or procedure. Ministry code, notes, and a serial number are stored on the Item. The internal code is built from ministry code, treatment type, and serial.
 
 Protocol price is stored on the Item and synchronized to the **نفقة الدولة** selling price list in EGP so invoices continue to use ERPNext Item Price. Existing imported catalog Items are exposed as protocol records during migration.
 
