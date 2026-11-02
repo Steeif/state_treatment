@@ -1,7 +1,7 @@
 """Import authorized breast-cancer protocol master data from a private file.
 
 Creates (idempotently):
-- 4 Custom Fields on Item
+- protocol fields on Item
 - Price List "نفقة الدولة"
 - Item Group "سرطان بالثدي (مبادرة)"
 - one Item per protocol row  (item_code = "{protocol_code}-{serial}",
@@ -127,6 +127,7 @@ def import_item(row):
             "internal_protocol_code": "{0}-PROC-{1:05d}".format(row["protocol_code"], row["serial"]),
             "protocol_price": amount,
             "duration_days": row["duration_days"],
+            "procedure_time_days": row["duration_days"] or 0,
             "decision_sequence": row.get("decision_sequence"),
             "diagnosis_group": row["diagnosis_group"],
         })
@@ -150,6 +151,7 @@ def import_item(row):
         internal_protocol_code="{0}-PROC-{1:05d}".format(row["protocol_code"], row["serial"]),
         protocol_price=amount,
         duration_days=row["duration_days"],
+        procedure_time_days=row["duration_days"] or 0,
         decision_sequence=row.get("decision_sequence"),
         diagnosis_group=row["diagnosis_group"],
     ))
