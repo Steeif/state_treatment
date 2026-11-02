@@ -15,6 +15,7 @@ ITEM_CUSTOM_FIELDS = [
         "fieldtype": "Data",
         "insert_after": "item_code",
         "depends_on": "eval:doc.is_protocol",
+        "mandatory_depends_on": "eval:doc.is_protocol",
     },
     {
         "fieldname": "is_protocol",
@@ -133,6 +134,7 @@ ITEM_CUSTOM_FIELDS = [
         "fieldtype": "Int",
         "insert_after": "medicine_name",
         "depends_on": 'eval:doc.is_protocol && doc.protocol_treatment_type == "Medicine"',
+        "mandatory_depends_on": 'eval:doc.is_protocol && doc.protocol_treatment_type == "Medicine"',
     },
     {
         "fieldname": "dose_interval_days",
