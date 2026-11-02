@@ -127,7 +127,6 @@ def import_item(row):
             "internal_protocol_code": "{0}-PROC-{1:05d}".format(row["protocol_code"], row["serial"]),
             "protocol_price": amount,
             "duration_days": row["duration_days"],
-            "procedure_time_days": row["duration_days"] or 0,
             "decision_sequence": row.get("decision_sequence"),
             "diagnosis_group": row["diagnosis_group"],
         })
@@ -151,7 +150,6 @@ def import_item(row):
         internal_protocol_code="{0}-PROC-{1:05d}".format(row["protocol_code"], row["serial"]),
         protocol_price=amount,
         duration_days=row["duration_days"],
-        procedure_time_days=row["duration_days"] or 0,
         decision_sequence=row.get("decision_sequence"),
         diagnosis_group=row["diagnosis_group"],
     ))
