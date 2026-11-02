@@ -57,10 +57,11 @@ ITEM_CUSTOM_FIELDS = [
     },
     {
         "fieldname": "duration_days",
-        "label": "مدة الفترة بالأيام / Period Duration (Days)",
+        "label": "مدة العلاج بالأيام / Treatment Duration (Days)",
         "fieldtype": "Int",
         "insert_after": "internal_protocol_code",
-        "depends_on": "eval:doc.is_protocol",
+        "depends_on": 'eval:doc.is_protocol && doc.protocol_treatment_type == "Medicine"',
+        "mandatory_depends_on": 'eval:doc.is_protocol && doc.protocol_treatment_type == "Medicine"',
     },
     {
         "fieldname": "decision_sequence",
@@ -106,24 +107,31 @@ ITEM_CUSTOM_FIELDS = [
     },
     {
         "fieldname": "procedure_time_days",
-        "label": "وقت الإجراء بالأيام / Procedure Time (Days)",
+        "label": "Procedure Time (Unused)",
         "fieldtype": "Int",
         "insert_after": "procedure_schedule",
-        "read_only": 1,
-        "depends_on": 'eval:doc.is_protocol && doc.protocol_treatment_type == "Procedure"',
+        "hidden": 1,
     },
     {
         "fieldname": "medicine_section",
         "label": "بيانات الدواء / Medicine Details",
         "fieldtype": "Section Break",
-        "insert_after": "procedure_time_days",
+        "insert_after": "procedure_schedule",
         "depends_on": 'eval:doc.is_protocol && doc.protocol_treatment_type == "Medicine"',
+    },
+    {
+        "fieldname": "medicine_name",
+        "label": "اسم الدواء / Medicine Name",
+        "fieldtype": "Data",
+        "insert_after": "medicine_section",
+        "depends_on": 'eval:doc.is_protocol && doc.protocol_treatment_type == "Medicine"',
+        "mandatory_depends_on": 'eval:doc.is_protocol && doc.protocol_treatment_type == "Medicine"',
     },
     {
         "fieldname": "number_of_doses",
         "label": "عدد الجرعات / Number of Doses",
         "fieldtype": "Int",
-        "insert_after": "medicine_section",
+        "insert_after": "medicine_name",
         "depends_on": 'eval:doc.is_protocol && doc.protocol_treatment_type == "Medicine"',
     },
     {
@@ -177,7 +185,6 @@ def backfill_existing_protocol_items():
             "protocol_treatment_type",
             "internal_protocol_code",
             "protocol_price",
-            "procedure_time_days",
         ],
     )
     for item in items:
@@ -196,7 +203,6 @@ def backfill_existing_protocol_items():
             "protocol_treatment_type": item.protocol_treatment_type or "Procedure",
             "protocol_serial": serial,
             "internal_protocol_code": item.internal_protocol_code or internal_code,
-            "procedure_time_days": cint(item.duration_days) if cint(item.duration_days) else 0,
         }
         price = frappe.db.get_value(
             "Item Price",
@@ -226,9 +232,9 @@ def validate_protocol_item(doc, method=None):
         f"{doc.official_protocol_code}-{type_code}-{cint(doc.protocol_serial):05d}"
     )
 
-    if doc.protocol_treatment_type == "Procedure":
-        doc.procedure_time_days = cint(doc.duration_days) if cint(doc.duration_days) else 0
     if doc.protocol_treatment_type == "Medicine":
+        if not doc.get("medicine_name"):
+            frappe.throw(_("Medicine name is required for a medicine protocol."))
         doses = cint(doc.number_of_doses)
         duration = flt(doc.duration_days)
         if doses <= 0:
