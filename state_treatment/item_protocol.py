@@ -116,7 +116,7 @@ ITEM_CUSTOM_FIELDS = [
         "fieldname": "medicine_section",
         "label": "بيانات الدواء / Medicine Details",
         "fieldtype": "Section Break",
-        "insert_after": "procedure_schedule",
+        "insert_after": "procedure_time_days",
         "depends_on": 'eval:doc.is_protocol && doc.protocol_treatment_type == "Medicine"',
     },
     {
