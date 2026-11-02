@@ -138,6 +138,12 @@ bench --site [site-name] execute state_treatment.patches.v1_0.import_breast_canc
 
 The default file path is `state_treatment/data/breast_cancer_protocols.json`; that file is ignored by Git. The catalog and patient records must not be committed to this repository. The administrator must also configure the State-funded price list. Without the catalog and prices, staff cannot add protocol items to requests.
 
+## Protocol Items
+
+Create protocol records from **Item**. Check **Is Protocol** to show the protocol fields, then choose **Medicine** or **Procedure** to show the matching section. The Item name is the treatment or procedure name. Ministry code, period duration, schedule, dose count, notes, and serial are stored on the Item. Internal protocol code is built from the ministry code, treatment type, and serial. For medicine protocols, the interval is calculated as period duration divided by dose count; procedure time follows the period duration when it is non-zero.
+
+Protocol price is stored on the Item and synchronized to the **نفقة الدولة** selling price list in EGP so invoices continue to use the ERPNext Item Price. Existing imported protocol catalog Items are exposed as protocol records during migration.
+
 ## What the App Includes
 
 - A request record with a tracked approval workflow.
