@@ -43,8 +43,8 @@
   },
   {
    "fieldname": "recommendation_year",
-   "fieldtype": "Data",
-   "label": "سنة التوصية / Recommendation Year"
+   "fieldtype": "Date",
+   "label": "تاريخ التوصية / Recommendation Date"
   },
   {
    "fieldname": "codes_section",
