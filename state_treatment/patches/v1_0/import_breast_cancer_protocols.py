@@ -14,22 +14,9 @@ import os
 
 import frappe
 from frappe import _
+from state_treatment.item_protocol import ensure_item_protocol_fields
 
 PRICE_LIST = "نفقة الدولة"
-
-ITEM_CUSTOM_FIELDS = {
-    "Item": [
-        dict(fieldname="official_protocol_code", label="Official Protocol Code",
-             fieldtype="Data", insert_after="item_code"),
-        dict(fieldname="duration_days", label="Duration (Days)",
-             fieldtype="Int", insert_after="official_protocol_code"),
-        dict(fieldname="decision_sequence", label="Decision Sequence",
-             fieldtype="Int", insert_after="duration_days"),
-        dict(fieldname="diagnosis_group", label="Diagnosis Group",
-             fieldtype="Data", insert_after="item_group", in_standard_filter=1),
-    ]
-}
-
 
 def execute(file_path=None):
     """Import protocol data explicitly after install; never run as a migration patch."""
@@ -91,10 +78,7 @@ def validate_rows(rows):
 
 
 def ensure_custom_fields():
-    from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
-
-    create_custom_fields(ITEM_CUSTOM_FIELDS, ignore_validate=True)
-    frappe.clear_cache(doctype="Item")
+    ensure_item_protocol_fields()
 
 
 def ensure_price_list():
@@ -137,6 +121,11 @@ def import_item(row):
             "item_name": row["procedure_name"],
             "item_group": row["diagnosis_group"],
             "official_protocol_code": row["protocol_code"],
+            "is_protocol": 1,
+            "protocol_treatment_type": "Procedure",
+            "protocol_serial": row["serial"],
+            "internal_protocol_code": "{0}-PROC-{1:05d}".format(row["protocol_code"], row["serial"]),
+            "protocol_price": amount,
             "duration_days": row["duration_days"],
             "decision_sequence": row.get("decision_sequence"),
             "diagnosis_group": row["diagnosis_group"],
@@ -155,6 +144,11 @@ def import_item(row):
         is_purchase_item=0,
         include_item_in_manufacturing=0,
         official_protocol_code=row["protocol_code"],
+        is_protocol=1,
+        protocol_treatment_type="Procedure",
+        protocol_serial=row["serial"],
+        internal_protocol_code="{0}-PROC-{1:05d}".format(row["protocol_code"], row["serial"]),
+        protocol_price=amount,
         duration_days=row["duration_days"],
         decision_sequence=row.get("decision_sequence"),
         diagnosis_group=row["diagnosis_group"],
