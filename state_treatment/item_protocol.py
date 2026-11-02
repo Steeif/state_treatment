@@ -105,6 +105,14 @@ ITEM_CUSTOM_FIELDS = [
         "depends_on": 'eval:doc.is_protocol && doc.protocol_treatment_type == "Procedure"',
     },
     {
+        "fieldname": "procedure_time_days",
+        "label": "وقت الإجراء بالأيام / Procedure Time (Days)",
+        "fieldtype": "Int",
+        "insert_after": "procedure_schedule",
+        "read_only": 1,
+        "depends_on": 'eval:doc.is_protocol && doc.protocol_treatment_type == "Procedure"',
+    },
+    {
         "fieldname": "medicine_section",
         "label": "بيانات الدواء / Medicine Details",
         "fieldtype": "Section Break",
@@ -174,7 +182,7 @@ def backfill_existing_protocol_items():
     for item in items:
         serial = cint(item.protocol_serial)
         if not serial:
-            match = re.search(r"-(\\d+)$", item.name)
+            match = re.search(r"-(\d+)$", item.name)
             serial = cint(match.group(1)) if match else 0
         if not serial:
             serial_token = make_autoname("STP-.#####")
@@ -216,6 +224,8 @@ def validate_protocol_item(doc, method=None):
         f"{doc.official_protocol_code}-{type_code}-{cint(doc.protocol_serial):05d}"
     )
 
+    if doc.protocol_treatment_type == "Procedure":
+        doc.procedure_time_days = cint(doc.duration_days) if cint(doc.duration_days) else 0
     if doc.protocol_treatment_type == "Medicine":
         doses = cint(doc.number_of_doses)
         duration = flt(doc.duration_days)
