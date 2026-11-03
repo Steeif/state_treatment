@@ -7,6 +7,11 @@
   "fields": [
     {"fieldname": "item", "fieldtype": "Link", "label": "Item", "options": "Item"},
     {"fieldname": "item_name", "fieldtype": "Data", "label": "Item Name", "read_only": 1},
+    {"fieldname": "treatment_type", "fieldtype": "Data", "label": "Treatment Type", "read_only": 1, "hidden": 1},
+    {"fieldname": "medicine_name", "fieldtype": "Data", "label": "Medicine Name", "read_only": 1, "depends_on": "eval:doc.treatment_type == 'Medicine'"},
+    {"fieldname": "number_of_doses", "fieldtype": "Int", "label": "Number of Doses", "read_only": 1, "depends_on": "eval:doc.treatment_type == 'Medicine'"},
+    {"fieldname": "dose_interval_days", "fieldtype": "Float", "label": "Days Between Doses", "read_only": 1, "depends_on": "eval:doc.treatment_type == 'Medicine'"},
+    {"fieldname": "first_dose_date", "fieldtype": "Date", "label": "First Dose Date", "depends_on": "eval:doc.treatment_type == 'Medicine'"},
     {"fieldname": "rate", "fieldtype": "Currency", "label": "Rate", "options": "currency", "read_only": 1},
     {"fieldname": "duration_days", "fieldtype": "Int", "label": "Duration (Days)", "read_only": 1},
     {"fieldname": "decision_sequence", "fieldtype": "Int", "label": "Decision Sequence", "read_only": 1},

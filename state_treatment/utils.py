@@ -28,7 +28,11 @@ def get_protocol_item_details(item_code):
     item = frappe.db.get_value(
         "Item",
         item_code,
-        ["item_name", "duration_days", "decision_sequence", "official_protocol_code"],
+        [
+            "item_name", "duration_days", "decision_sequence", "official_protocol_code",
+            "protocol_treatment_type", "medicine_name", "number_of_doses",
+            "dose_interval_days",
+        ],
         as_dict=True,
     ) or {}
     if not item.get("official_protocol_code"):
@@ -39,5 +43,9 @@ def get_protocol_item_details(item_code):
         "duration_days": item.get("duration_days") or 0,
         "decision_sequence": item.get("decision_sequence"),
         "official_protocol_code": item.get("official_protocol_code"),
+        "treatment_type": item.get("protocol_treatment_type"),
+        "medicine_name": item.get("medicine_name"),
+        "number_of_doses": item.get("number_of_doses") or 0,
+        "dose_interval_days": item.get("dose_interval_days") or 0,
         "price": get_protocol_item_price(item_code),
     }
