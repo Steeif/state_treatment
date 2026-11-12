@@ -1,0 +1,44 @@
+[
+  {
+    "doctype": "Workflow State",
+    "name": "Draft",
+    "workflow_state_name": "Draft",
+    "style": ""
+  },
+  {
+    "doctype": "Workflow State",
+    "name": "Under Committee Review",
+    "workflow_state_name": "Under Committee Review",
+    "style": ""
+  },
+  {
+    "doctype": "Workflow State",
+    "name": "Administrative Letter",
+    "workflow_state_name": "Administrative Letter",
+    "style": ""
+  },
+  {
+    "doctype": "Workflow State",
+    "name": "Recommendation Approved",
+    "workflow_state_name": "Recommendation Approved",
+    "style": "Success"
+  },
+  {
+    "doctype": "Workflow State",
+    "name": "File Reviewed at Hospital",
+    "workflow_state_name": "File Reviewed at Hospital",
+    "style": ""
+  },
+  {
+    "doctype": "Workflow State",
+    "name": "Approved for Disbursement",
+    "workflow_state_name": "Approved for Disbursement",
+    "style": "Success"
+  },
+  {
+    "doctype": "Workflow State",
+    "name": "Rejected",
+    "workflow_state_name": "Rejected",
+    "style": "Danger"
+  }
+]
