@@ -41,7 +41,17 @@ class StateTreatmentRecommendation(Document):
                 frappe.throw(_("Treatment Pharmacists can only update existing recommendations."))
 
             for field in self.meta.fields:
-                if field.fieldname != "treatment_doses" and self.get(field.fieldname) != previous_doc.get(field.fieldname):
+                if field.fieldname == "treatment_doses":
+                    continue
+                if field.fieldtype == "Table":
+                    # Child rows are compared as plain data. Comparing the row
+                    # objects directly would always differ.
+                    changed = self._table_snapshot(self.get(field.fieldname)) != self._table_snapshot(
+                        previous_doc.get(field.fieldname)
+                    )
+                else:
+                    changed = self.get(field.fieldname) != previous_doc.get(field.fieldname)
+                if changed:
                     frappe.throw(_("Treatment Pharmacists can only update dose dispensing."))
 
             current_rows = {row.name: row for row in self.treatment_doses}
@@ -244,6 +254,16 @@ class StateTreatmentRecommendation(Document):
             row.rate = flt(rate)
             total += flt(row.rate)
         self.total_amount = total
+
+    @staticmethod
+    def _table_snapshot(rows):
+        """Child rows as plain dicts, without Frappe's bookkeeping columns."""
+        skip = {"creation", "modified", "modified_by", "owner", "docstatus", "idx",
+                "parent", "parentfield", "parenttype"}
+        return [
+            {k: v for k, v in row.as_dict().items() if k not in skip}
+            for row in (rows or [])
+        ]
 
     @staticmethod
     def _has_protocol_catalog():
