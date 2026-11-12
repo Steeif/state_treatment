@@ -5,8 +5,7 @@ from frappe import _
 from frappe.model.naming import make_autoname
 from frappe.utils import cint, flt
 
-
-STATE_PRICE_LIST = "نفقة الدولة"
+from state_treatment.settings import get_state_price_list
 
 ITEM_CUSTOM_FIELDS = [
     {
@@ -171,7 +170,8 @@ def backfill_existing_protocol_items():
     """Keep catalog items created by the existing importer visible as protocols."""
     if not frappe.db.table_exists("Item") or not frappe.db.table_exists("Item Price"):
         return
-    if not frappe.db.exists("Price List", STATE_PRICE_LIST):
+    price_list = get_state_price_list()
+    if not frappe.db.exists("Price List", price_list):
         return
 
     items = frappe.get_all(
@@ -208,7 +208,7 @@ def backfill_existing_protocol_items():
         }
         price = frappe.db.get_value(
             "Item Price",
-            {"item_code": item.name, "price_list": STATE_PRICE_LIST},
+            {"item_code": item.name, "price_list": price_list},
             "price_list_rate",
         )
         if item.protocol_price is None and price is not None:
@@ -249,12 +249,13 @@ def validate_protocol_item(doc, method=None):
 def sync_protocol_price(doc, method=None):
     if not cint(doc.get("is_protocol")) or doc.get("protocol_price") in (None, ""):
         return
-    if not frappe.db.exists("Price List", STATE_PRICE_LIST):
+    price_list = get_state_price_list()
+    if not frappe.db.exists("Price List", price_list):
         frappe.throw(_("Create the State-funded price list before setting a protocol price."))
 
     item_price = frappe.db.get_value(
         "Item Price",
-        {"item_code": doc.name, "price_list": STATE_PRICE_LIST},
+        {"item_code": doc.name, "price_list": price_list},
         "name",
     )
     if item_price:
@@ -269,7 +270,7 @@ def sync_protocol_price(doc, method=None):
             {
                 "doctype": "Item Price",
                 "item_code": doc.name,
-                "price_list": STATE_PRICE_LIST,
+                "price_list": price_list,
                 "price_list_rate": flt(doc.protocol_price),
             }
         ).insert(ignore_permissions=True)

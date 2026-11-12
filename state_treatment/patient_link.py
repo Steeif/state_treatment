@@ -7,6 +7,8 @@ import frappe
 from frappe import _
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
+from state_treatment.settings import get_patient_national_id_field
+
 RECOMMENDATION = "State Treatment Recommendation"
 
 PATIENT_CUSTOM_FIELDS = [
@@ -54,17 +56,12 @@ def ensure_patient_fields():
     frappe.clear_cache(doctype="Patient")
 
 
-# Custom field "رقم البطاقة" (card number = national ID). It exists on client
-# sites only; this app never creates it. Frappe derives the fieldname by
-# replacing spaces with underscores, so the label gives this name.
-PATIENT_NATIONAL_ID_FIELD = "رقم_البطاقة"
-
-
 def get_patient_national_id(patient):
     """Return the patient's national ID, or None if the site has no such field."""
-    if not patient or not frappe.get_meta("Patient").has_field(PATIENT_NATIONAL_ID_FIELD):
+    fieldname = get_patient_national_id_field()
+    if not patient or not frappe.get_meta("Patient").has_field(fieldname):
         return None
-    return frappe.db.get_value("Patient", patient, PATIENT_NATIONAL_ID_FIELD)
+    return frappe.db.get_value("Patient", patient, fieldname)
 
 
 def get_patient_summary(patient, exclude=None):

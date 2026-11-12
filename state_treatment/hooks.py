@@ -7,6 +7,7 @@ app_license = "MIT"
 required_apps = ["erpnext", "healthcare"]
 
 after_migrate = [
+    "state_treatment.settings.ensure_settings",
     "state_treatment.item_protocol.ensure_item_protocol_fields",
     "state_treatment.patient_link.ensure_patient_fields",
     "state_treatment.patient_link.backfill_patient_summaries",

@@ -1,6 +1,6 @@
 import frappe
 
-STATE_PRICE_LIST = "نفقة الدولة"  # State-funded price list
+from state_treatment.settings import get_state_price_list
 
 
 def get_protocol_item_price(item_code):
@@ -10,7 +10,7 @@ def get_protocol_item_price(item_code):
     uom = frappe.db.get_value("Item", item_code, "stock_uom")
     prices = get_item_price(
         {
-            "price_list": STATE_PRICE_LIST,
+            "price_list": get_state_price_list(),
             "uom": uom,
             "transaction_date": frappe.utils.nowdate(),
         },

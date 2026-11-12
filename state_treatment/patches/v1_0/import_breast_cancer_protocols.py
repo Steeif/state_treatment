@@ -15,8 +15,7 @@ import os
 import frappe
 from frappe import _
 from state_treatment.item_protocol import ensure_item_protocol_fields
-
-PRICE_LIST = "نفقة الدولة"
+from state_treatment.settings import get_state_price_list
 
 def execute(file_path=None):
     """Import protocol data explicitly after install; never run as a migration patch."""
@@ -82,8 +81,9 @@ def ensure_custom_fields():
 
 
 def ensure_price_list():
-    if frappe.db.exists("Price List", PRICE_LIST):
-        details = frappe.db.get_value("Price List", PRICE_LIST, ["currency", "enabled", "selling"], as_dict=True)
+    price_list = get_state_price_list()
+    if frappe.db.exists("Price List", price_list):
+        details = frappe.db.get_value("Price List", price_list, ["currency", "enabled", "selling"], as_dict=True)
         currency = details.currency
         if currency != "EGP":
             frappe.throw(_("The State-funded price list must use EGP; current currency is {0}.").format(currency))
@@ -92,7 +92,7 @@ def ensure_price_list():
     else:
         frappe.get_doc(dict(
             doctype="Price List",
-            price_list_name=PRICE_LIST,
+            price_list_name=price_list,
             enabled=1,
             selling=1,
             buying=0,
@@ -158,14 +158,15 @@ def import_item(row):
 
 
 def upsert_price(item_code, amount):
+    price_list = get_state_price_list()
     name = frappe.db.get_value(
-        "Item Price", {"item_code": item_code, "price_list": PRICE_LIST}, "name")
+        "Item Price", {"item_code": item_code, "price_list": price_list}, "name")
     if name:
         frappe.db.set_value("Item Price", name, "price_list_rate", amount)
     else:
         frappe.get_doc(dict(
             doctype="Item Price",
             item_code=item_code,
-            price_list=PRICE_LIST,
+            price_list=price_list,
             price_list_rate=amount,
         )).insert(ignore_permissions=True)
