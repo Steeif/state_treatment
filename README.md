@@ -48,11 +48,11 @@ Schedules are linked to the individual request-item row, so duplicate medicines 
 
 ### Prerequisites
 
-**Yes, Healthcare is required.** Before installing State Treatment, install these platform apps on the same Frappe site, in this order:
+**Yes, Healthcare is required.** Before installing State Treatment, install these platform apps on the same Frappe site, in this order. These are the versions this app has been tested with on Frappe v14:
 
-1. Frappe Framework **v15.117.0**
-2. ERPNext **v15.97.0**
-3. Healthcare **v15.2.1**
+1. Frappe Framework **v14.67.0** (`version-14`)
+2. ERPNext **v14.65.0** (`version-14`)
+3. Healthcare **v14.1.3** (`version-14`)
 
 State Treatment is the app documented in this repository, not a prerequisite. Install it after the three platform apps using the command below.
 
