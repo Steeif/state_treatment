@@ -8,6 +8,7 @@ from frappe.model.document import Document
 from frappe.model.naming import make_autoname
 from frappe.utils import cint, flt, getdate, now_datetime, nowdate
 
+from state_treatment.patient_link import get_patient_national_id
 from state_treatment.utils import get_protocol_item_price
 
 
@@ -21,10 +22,19 @@ class StateTreatmentRecommendation(Document):
         )
 
     def validate(self):
+        self.fill_national_id()
         self.calculate_total()
         self.validate_treatment_doses()
         self.generate_approved_doses()
         self.update_dose_summary()
+
+    def fill_national_id(self):
+        """Copy the patient's national ID when this is empty, or when the patient changes."""
+        if not self.patient:
+            return
+        if self.national_id and not self.has_value_changed("patient"):
+            return
+        self.national_id = get_patient_national_id(self.patient)
 
     def validate_treatment_doses(self):
         previous_doc = self.get_doc_before_save()
