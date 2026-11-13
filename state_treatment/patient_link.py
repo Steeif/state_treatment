@@ -15,7 +15,7 @@ PATIENT_CUSTOM_FIELDS = [
     {
         "fieldname": "state_treatment_section",
         "fieldtype": "Section Break",
-        "label": "علاج الدولة / State Treatment",
+        "label": "State Treatment",
         "insert_after": "uid",
         "collapsible": 1,
     },
