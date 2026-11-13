@@ -25,7 +25,7 @@ class StateTreatmentRecommendation(Document):
         self.fill_national_id()
         self.calculate_total()
         self.validate_treatment_doses()
-        self.generate_approved_doses()
+        self.sync_dose_schedule()
         self.update_dose_summary()
 
     def fill_national_id(self):
@@ -100,82 +100,122 @@ class StateTreatmentRecommendation(Document):
                 row.dispensed_by = previous_row.dispensed_by
                 row.dispensed_on = previous_row.dispensed_on
 
-    def generate_approved_doses(self):
-        """Append a dose schedule when an order is finally approved; never rewrite history."""
-        if self.status != APPROVED_STATUS:
-            return
+    def sync_dose_schedule(self):
+        """Build the dose schedule from the medicine rows in Protocol Items.
 
-        schedules = {}
+        Draft: the schedule follows the current medicines. Undispensed doses of
+        a changed or removed regimen are dropped; dispensed doses are kept.
+        Approved: a changed regimen is appended as a new version, so history is
+        never rewritten.
+        """
+        if self._is_pharmacist_only():
+            return  # pharmacists record dispensing only and do not change the schedule
+
+        approved = self.status == APPROVED_STATUS
+
+        latest = {}
         for dose in self.treatment_doses:
             protocol_item = dose.get("protocol_item")
             if not protocol_item:
                 continue
             version = cint(dose.get("schedule_version"))
-            schedule = schedules.setdefault(protocol_item, {"version": 0, "signature": None})
-            if version >= schedule["version"]:
-                schedule["version"] = version
-                schedule["signature"] = dose.get("regimen_signature")
+            if version >= latest.get(protocol_item, {}).get("version", 0):
+                latest[protocol_item] = {
+                    "version": version,
+                    "signature": dose.get("regimen_signature"),
+                }
 
+        wanted = {}
         for row in self.protocol_items:
-            if not row.item:
+            plan = self._medicine_plan(row)
+            if not plan:
                 continue
-
-            protocol = frappe.db.get_value(
-                "Item",
-                row.item,
-                [
-                    "protocol_treatment_type", "medicine_name", "number_of_doses",
-                    "dose_interval_days",
-                ],
-                as_dict=True,
-            )
-            if not protocol or protocol.protocol_treatment_type != "Medicine":
-                continue
-
-            dose_count = cint(protocol.number_of_doses)
-            interval = flt(protocol.dose_interval_days)
-            if not row.first_dose_date:
-                frappe.throw(
-                    _("Set the first dose date for medicine {0} before final approval.").format(
-                        protocol.medicine_name or row.item
+            if not plan["first_date"]:
+                if approved:
+                    frappe.throw(
+                        _("Set the first dose date for medicine {0} before final approval.").format(
+                            plan["medicine_name"]
+                        )
                     )
-                )
-            if dose_count <= 0 or interval < 0:
-                frappe.throw(_("Medicine {0} has an invalid dose protocol.").format(row.item))
+                continue  # draft: the schedule waits for the first dose date
+            wanted[row.name] = plan
 
-            snapshot = {
-                "protocol_item": row.name,
-                "item": row.item,
-                "medicine_name": protocol.medicine_name or row.item,
-                "number_of_doses": dose_count,
-                "dose_interval_days": interval,
-                "first_dose_date": str(getdate(row.first_dose_date)),
-            }
-            signature = hashlib.sha256(
-                json.dumps(snapshot, sort_keys=True, separators=(",", ":")).encode("utf-8")
-            ).hexdigest()
-            current_schedule = schedules.get(row.name)
-            if current_schedule and current_schedule["signature"] == signature:
+        stale = {
+            protocol_item for protocol_item, current in latest.items()
+            if protocol_item not in wanted or wanted[protocol_item]["signature"] != current["signature"]
+        }
+        if stale and not approved:
+            self.set("treatment_doses", [
+                dose for dose in self.treatment_doses
+                if not (dose.get("protocol_item") in stale and not cint(dose.dispensed))
+            ])
+
+        for protocol_item, plan in wanted.items():
+            current = latest.get(protocol_item)
+            if current and current["signature"] == plan["signature"]:
                 continue
 
-            version = (current_schedule["version"] if current_schedule else 0) + 1
-            first_date = getdate(row.first_dose_date)
-            for dose_number in range(dose_count):
-                scheduled_date = first_date + timedelta(days=interval * dose_number)
+            version = (current["version"] if current else 0) + 1
+            for dose_number in range(plan["dose_count"]):
                 self.append(
                     "treatment_doses",
                     {
-                        "item": row.item,
-                        "medicine_name": protocol.medicine_name or row.item,
-                        "dose": _("Dose {0} of {1}").format(dose_number + 1, dose_count),
-                        "scheduled_date": scheduled_date,
+                        "item": plan["item"],
+                        "medicine_name": plan["medicine_name"],
+                        "dose": _("Dose {0} of {1}").format(dose_number + 1, plan["dose_count"]),
+                        "scheduled_date": plan["first_date"] + timedelta(days=plan["interval"] * dose_number),
                         "dispensed": 0,
-                        "protocol_item": row.name,
+                        "protocol_item": protocol_item,
                         "schedule_version": version,
-                        "regimen_signature": signature,
+                        "regimen_signature": plan["signature"],
                     },
                 )
-            schedules[row.name] = {"version": version, "signature": signature}
+
+    @staticmethod
+    def _medicine_plan(row):
+        """Schedule inputs for a medicine row in Protocol Items, or None for a procedure."""
+        if not row.item:
+            return None
+        protocol = frappe.db.get_value(
+            "Item",
+            row.item,
+            ["protocol_treatment_type", "medicine_name", "number_of_doses", "dose_interval_days"],
+            as_dict=True,
+        )
+        if not protocol or protocol.protocol_treatment_type != "Medicine":
+            return None
+
+        dose_count = cint(protocol.number_of_doses)
+        interval = flt(protocol.dose_interval_days)
+        if dose_count <= 0 or interval < 0:
+            frappe.throw(_("Medicine {0} has an invalid dose protocol.").format(row.item))
+
+        medicine_name = protocol.medicine_name or row.item
+        first_date = getdate(row.first_dose_date) if row.first_dose_date else None
+        snapshot = {
+            "protocol_item": row.name,
+            "item": row.item,
+            "medicine_name": medicine_name,
+            "number_of_doses": dose_count,
+            "dose_interval_days": interval,
+            "first_dose_date": str(first_date) if first_date else None,
+        }
+        signature = hashlib.sha256(
+            json.dumps(snapshot, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
+        return {
+            "item": row.item,
+            "medicine_name": medicine_name,
+            "dose_count": dose_count,
+            "interval": interval,
+            "first_date": first_date,
+            "signature": signature,
+        }
+
+    @staticmethod
+    def _is_pharmacist_only():
+        roles = set(frappe.get_roles())
+        return "Treatment Pharmacist" in roles and "System Manager" not in roles
 
     def update_dose_summary(self):
         if self.status != APPROVED_STATUS:
