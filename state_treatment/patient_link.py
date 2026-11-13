@@ -64,6 +64,24 @@ def get_patient_national_id(patient):
     return frappe.db.get_value("Patient", patient, fieldname)
 
 
+@frappe.whitelist()
+def get_patient_national_id_details(patient):
+    """Called by the treatment request form when a patient is picked.
+
+    Tells the form whether the configured Patient field exists on this site,
+    so a missing field is reported instead of silently leaving the ID blank.
+    """
+    if not patient or not frappe.has_permission("Patient", "read"):
+        frappe.throw(_("You do not have permission to read this patient."))
+    fieldname = get_patient_national_id_field()
+    field_exists = frappe.get_meta("Patient").has_field(fieldname)
+    return {
+        "fieldname": fieldname,
+        "field_exists": field_exists,
+        "national_id": frappe.db.get_value("Patient", patient, fieldname) if field_exists else None,
+    }
+
+
 def get_patient_summary(patient, exclude=None):
     """Return the summary values for a patient, computed from the recommendations."""
     filters = {"patient": patient}
