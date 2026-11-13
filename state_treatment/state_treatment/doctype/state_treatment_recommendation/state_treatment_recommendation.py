@@ -6,13 +6,14 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.model.naming import make_autoname
-from frappe.utils import cint, flt, getdate, now_datetime, nowdate
+from frappe.utils import cint, flt, formatdate, getdate, now_datetime, nowdate
 
 from state_treatment.patient_link import get_patient_national_id
 from state_treatment.utils import get_protocol_item_price
 
 
 APPROVED_STATUS = "Approved for Disbursement"
+COMPLETED_STATUS = "Treatment Completed"
 
 
 class StateTreatmentRecommendation(Document):
@@ -25,7 +26,9 @@ class StateTreatmentRecommendation(Document):
         self.fill_national_id()
         self.calculate_total()
         self.validate_treatment_doses()
+        self.validate_procedure_done()
         self.sync_dose_schedule()
+        self.complete_treatment_if_done()
         self.update_dose_summary()
 
     def fill_national_id(self):
@@ -111,7 +114,7 @@ class StateTreatmentRecommendation(Document):
         if self._is_pharmacist_only():
             return  # pharmacists record dispensing only and do not change the schedule
 
-        approved = self.status == APPROVED_STATUS
+        approved = self.status in (APPROVED_STATUS, COMPLETED_STATUS)
 
         latest = {}
         for dose in self.treatment_doses:
@@ -218,7 +221,7 @@ class StateTreatmentRecommendation(Document):
         return "Treatment Pharmacist" in roles and "System Manager" not in roles
 
     def update_dose_summary(self):
-        if self.status != APPROVED_STATUS:
+        if self.status not in (APPROVED_STATUS, COMPLETED_STATUS):
             self.dose_summary = ""
             return
 
@@ -256,6 +259,13 @@ class StateTreatmentRecommendation(Document):
                     medicine_name, dispensed, len(rows), len(rows) - dispensed
                 )
             )
+        for row in self.protocol_items:
+            if row.item and row.treatment_type == "Procedure":
+                if cint(row.procedure_done):
+                    summaries.append(_("{0}: performed on {1}").format(
+                        row.item_name or row.item, formatdate(row.procedure_done_on)))
+                else:
+                    summaries.append(_("{0}: not performed yet").format(row.item_name or row.item))
         self.dose_summary = "\n".join(summaries)
 
     def calculate_total(self):
@@ -304,6 +314,65 @@ class StateTreatmentRecommendation(Document):
             row.rate = flt(rate)
             total += flt(row.rate)
         self.total_amount = total
+
+    def validate_procedure_done(self):
+        """A Medical Reviewer marks a procedure as done once; the date and user are recorded."""
+        previous_doc = self.get_doc_before_save()
+        previous_rows = {
+            row.name: row for row in (previous_doc.protocol_items if previous_doc else [])
+        }
+        roles = set(frappe.get_roles())
+        can_mark = bool({"Medical Reviewer", "System Manager"} & roles)
+
+        for row in self.protocol_items:
+            previous_row = previous_rows.get(row.name)
+            done = cint(row.procedure_done)
+            if not previous_row:
+                if done:
+                    frappe.throw(_("Procedures cannot be marked as done before they are saved."))
+                continue
+
+            if done == cint(previous_row.procedure_done):
+                row.procedure_done_by = previous_row.procedure_done_by
+                row.procedure_done_on = previous_row.procedure_done_on
+                continue
+
+            if row.treatment_type != "Procedure":
+                frappe.throw(_("Only procedure items can be marked as done."))
+            if not can_mark:
+                frappe.throw(_("Only a Medical Reviewer can mark a procedure as done."))
+            if not done:
+                frappe.throw(_("A completed procedure cannot be reverted."))
+            row.procedure_done_by = frappe.session.user
+            row.procedure_done_on = now_datetime()
+
+    def complete_treatment_if_done(self):
+        """Move an approved request to Treatment Completed once every dose is dispensed and every procedure is done."""
+        if self.status == APPROVED_STATUS and self._treatment_is_finished():
+            self.status = COMPLETED_STATUS
+
+    def _treatment_is_finished(self):
+        active = [row for row in self.protocol_items if row.item]
+        if not active:
+            return False
+        for row in active:
+            if row.treatment_type == "Procedure":
+                if not cint(row.procedure_done):
+                    return False
+            elif row.treatment_type == "Medicine":
+                doses = self._latest_doses(row.name)
+                if not doses or any(not cint(dose.dispensed) for dose in doses):
+                    return False
+            else:
+                return False
+        return True
+
+    def _latest_doses(self, protocol_item):
+        rows = [dose for dose in self.treatment_doses if dose.get("protocol_item") == protocol_item]
+        if not rows:
+            return []
+        latest = max(cint(dose.get("schedule_version")) for dose in rows)
+        return [dose for dose in rows if cint(dose.get("schedule_version")) == latest]
 
     @staticmethod
     def _table_snapshot(rows):

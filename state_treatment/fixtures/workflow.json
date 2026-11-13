@@ -42,6 +42,11 @@
     "state": "Rejected",
     "doc_status": "0",
     "allow_edit": "General Manager"
+   },
+   {
+    "state": "Treatment Completed",
+    "doc_status": "0",
+    "allow_edit": "General Manager"
    }
   ],
   "transitions": [

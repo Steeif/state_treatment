@@ -40,5 +40,11 @@
     "name": "Rejected",
     "workflow_state_name": "Rejected",
     "style": "Danger"
+  },
+  {
+    "doctype": "Workflow State",
+    "name": "Treatment Completed",
+    "workflow_state_name": "Treatment Completed",
+    "style": "Success"
   }
 ]

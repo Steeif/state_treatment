@@ -33,7 +33,7 @@
     {"fieldname": "triple_committee_report_date", "fieldtype": "Date", "label": "Triple Committee Report Date"},
     {"fieldname": "system_registration_date", "fieldtype": "Date", "label": "System Registration Date"},
     {"fieldname": "council_session_date", "fieldtype": "Date", "label": "Council Session Date"},
-    {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Draft\nUnder Committee Review\nAdministrative Letter\nRecommendation Approved\nFile Reviewed at Hospital\nApproved for Disbursement\nRejected", "default": "Draft", "read_only": 1, "in_standard_filter": 1, "in_list_view": 1},
+    {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Draft\nUnder Committee Review\nAdministrative Letter\nRecommendation Approved\nFile Reviewed at Hospital\nApproved for Disbursement\nRejected\nTreatment Completed", "default": "Draft", "read_only": 1, "in_standard_filter": 1, "in_list_view": 1},
     {"fieldname": "signers_section", "fieldtype": "Section Break", "label": "Signers"},
     {"fieldname": "admin_reviewer", "fieldtype": "Data", "label": "Admin Reviewer"},
     {"fieldname": "medical_reviewer", "fieldtype": "Data", "label": "Medical Reviewer"},
@@ -43,7 +43,7 @@
     {"fieldname": "currency", "fieldtype": "Link", "label": "Currency", "options": "Currency", "default": "EGP", "read_only": 1, "hidden": 1},
     {"fieldname": "total_amount", "fieldtype": "Currency", "label": "Total Amount", "options": "currency", "read_only": 1},
     {"fieldname": "treatment_tracking_tab", "fieldtype": "Tab Break", "label": "Treatment Tracking"},
-    {"fieldname": "dose_summary", "fieldtype": "Small Text", "label": "Dose Dispensing Summary", "read_only": 1},
+    {"fieldname": "dose_summary", "fieldtype": "Small Text", "label": "Treatment Summary", "read_only": 1},
     {"fieldname": "treatment_doses", "fieldtype": "Table", "label": "Treatment Dose Schedule", "options": "Treatment Dose Tracking Item"}
   ],
   "permissions": [
