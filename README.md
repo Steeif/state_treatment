@@ -17,6 +17,8 @@ In this release, hospital-file review is a step completed by the General Manager
 
 Before you begin, make sure the patient already exists in Healthcare, the administrator has loaded the treatment catalog and prices, and the **Patient Field Map** in State Treatment Settings points to Patient fields that exist on the site. Sign in with the role assigned to you. You will work with a **State Treatment Recommendation** record, which follows the approval workflow below.
 
+Before a request leaves Draft, fill in the **National ID**, **Recommendation No.**, **Recommendation Date**, and at least one **Protocol Item** with its item. Before final approval, every medicine row also needs a **First Dose Date**. An **Administrative Letter** needs its recommendation, letter text, and issue date.
+
 ### Workflow Graph
 
 ```mermaid

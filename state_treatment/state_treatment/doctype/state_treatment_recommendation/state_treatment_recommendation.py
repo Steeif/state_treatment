@@ -14,6 +14,8 @@ from state_treatment.utils import get_protocol_item_price
 
 APPROVED_STATUS = "Approved for Disbursement"
 COMPLETED_STATUS = "Treatment Completed"
+# Filled in before a request leaves Draft, so the committee never reviews an incomplete file.
+REQUIRED_BEFORE_REVIEW = ("national_id", "recommendation_no", "recommendation_year", "protocol_items")
 
 
 class StateTreatmentRecommendation(Document):
@@ -24,6 +26,7 @@ class StateTreatmentRecommendation(Document):
 
     def validate(self):
         self.fill_patient_fields()
+        self.validate_required_before_review()
         self.calculate_total()
         self.validate_treatment_doses()
         self.validate_procedure_done()
@@ -44,6 +47,24 @@ class StateTreatmentRecommendation(Document):
         for form_field, value in values.items():
             if patient_changed or not self.get(form_field):
                 self.set(form_field, value)
+
+    def validate_required_before_review(self):
+        """Block leaving Draft until the identity fields and protocol items are filled.
+
+        Treatment Pharmacists are skipped: they only record dispensing and cannot
+        correct these fields, so the check would only block their work.
+        """
+        if (self.status or "Draft") == "Draft" or self._is_pharmacist_only():
+            return
+        missing = [
+            _(self.meta.get_label(fieldname))
+            for fieldname in REQUIRED_BEFORE_REVIEW
+            if not self.get(fieldname)  # covers empty strings, None and an empty table
+        ]
+        if missing:
+            frappe.throw(
+                _("Fill these before the request leaves Draft: {0}").format(", ".join(missing))
+            )
 
     def validate_treatment_doses(self):
         previous_doc = self.get_doc_before_save()

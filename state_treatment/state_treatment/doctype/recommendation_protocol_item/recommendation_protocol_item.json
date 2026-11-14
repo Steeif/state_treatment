@@ -5,7 +5,7 @@
   "custom": 0,
   "istable": 1,
   "fields": [
-    {"fieldname": "item", "fieldtype": "Link", "label": "Item", "options": "Item"},
+    {"fieldname": "item", "fieldtype": "Link", "label": "Item", "options": "Item", "reqd": 1},
     {"fieldname": "item_name", "fieldtype": "Data", "label": "Item Name", "read_only": 1},
     {"fieldname": "treatment_type", "fieldtype": "Data", "label": "Treatment Type", "read_only": 1, "hidden": 1},
     {"fieldname": "medicine_name", "fieldtype": "Data", "label": "Medicine Name", "read_only": 1, "depends_on": "eval:doc.treatment_type == 'Medicine'"},

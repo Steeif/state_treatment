@@ -149,3 +149,4 @@
 "Treatment closed.","تم إغلاق العلاج.",
 "Only the General Manager can close a treatment.","المدير العام فقط يستطيع إغلاق العلاج.",
 "Every procedure must be done and every dose dispensed before the treatment can be closed.","يجب تنفيذ كل الإجراءات وصرف كل الجرعات قبل إغلاق العلاج.",
+"Fill these before the request leaves Draft: {0}","املأ هذه البيانات قبل خروج الطلب من المسودة: {0}",
