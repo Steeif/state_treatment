@@ -5,12 +5,12 @@
   "custom": 0,
   "autoname": "hash",
   "fields": [
-    {"fieldname": "recommendation", "fieldtype": "Link", "label": "Recommendation", "options": "State Treatment Recommendation", "reqd": 1},
+    {"fieldname": "recommendation", "fieldtype": "Link", "label": "Recommendation", "options": "State Treatment Recommendation", "reqd": 1, "description": "The recommendation this letter is about. Required."},
     {"fieldname": "request_no", "fieldtype": "Data", "label": "Request No."},
     {"fieldname": "committee_date", "fieldtype": "Date", "label": "Committee Date"},
-    {"fieldname": "letter_text", "fieldtype": "Text", "label": "Letter Text", "reqd": 1},
-    {"fieldname": "sent_to", "fieldtype": "Link", "label": "Sent To", "options": "Healthcare Service Unit"},
-    {"fieldname": "issue_date", "fieldtype": "Date", "label": "Issue Date", "reqd": 1}
+    {"fieldname": "letter_text", "fieldtype": "Text", "label": "Letter Text", "reqd": 1, "description": "The full text of the letter. Required."},
+    {"fieldname": "sent_to", "fieldtype": "Link", "label": "Sent To", "options": "Healthcare Service Unit", "description": "The healthcare unit that receives this letter."},
+    {"fieldname": "issue_date", "fieldtype": "Date", "label": "Issue Date", "reqd": 1, "description": "The date the letter was issued. Required."}
   ],
   "permissions": [
     {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "print": 1},
