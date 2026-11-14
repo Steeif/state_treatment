@@ -56,7 +56,11 @@ def seed_default_patient_map():
     # Sites set up before the map existed kept the National ID field in its own setting.
     # Read the stored value directly: get_single_value refuses a field that is no
     # longer in the doctype, and this setting was removed in 0.2.0.
-    legacy = frappe.db.get_value("Singles", {"doctype": SETTINGS, "field": "patient_national_id_field"}, "value")
+    rows = frappe.db.sql(
+        "SELECT value FROM `tabSingles` WHERE doctype = %s AND field = %s",
+        (SETTINGS, "patient_national_id_field"),
+    )
+    legacy = rows[0][0] if rows else None
     doc.append(MAP_FIELD, {
         "form_field": "national_id",
         "patient_field": legacy or DEFAULT_NATIONAL_ID_FIELD,
