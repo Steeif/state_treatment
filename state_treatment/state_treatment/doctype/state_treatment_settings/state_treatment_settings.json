@@ -10,10 +10,10 @@
   "engine": "InnoDB",
   "track_changes": 1,
   "document_type": "Setup",
-  "field_order": ["state_price_list", "patient_national_id_field"],
+  "field_order": ["state_price_list", "patient_field_map"],
   "fields": [
     {"fieldname": "state_price_list", "fieldtype": "Link", "label": "State-funded Price List", "options": "Price List", "reqd": 1, "default": "نفقة الدولة", "description": "Price list (EGP) that holds the protocol prices. Created automatically if it does not exist."},
-    {"fieldname": "patient_national_id_field", "fieldtype": "Data", "label": "Patient National ID Field", "reqd": 1, "default": "رقم_البطاقة", "description": "Fieldname of the Patient field that holds the national ID (card number)."}
+    {"fieldname": "patient_field_map", "fieldtype": "Table", "label": "Patient Field Map", "options": "State Treatment Patient Field", "description": "Copies values from the Patient record into request fields. Set the Form Field and the Patient Field for each row."}
   ],
   "permissions": [
     {"role": "System Manager", "read": 1, "write": 1, "create": 1, "print": 1}

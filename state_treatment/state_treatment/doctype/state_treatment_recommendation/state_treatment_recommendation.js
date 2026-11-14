@@ -26,7 +26,7 @@ frappe.ui.form.on("State Treatment Recommendation", {
     },
 
     patient(frm) {
-        fill_national_id(frm);
+        fill_patient_fields(frm);
     },
 });
 
@@ -68,26 +68,23 @@ frappe.ui.form.on("Recommendation Protocol Item", {
     },
 });
 
-function fill_national_id(frm) {
+function fill_patient_fields(frm) {
     const patient = frm.doc.patient;
-    if (!patient) {
-        frm.set_value("national_id", null);
-        return;
-    }
     frappe.call({
-        method: "state_treatment.patient_link.get_patient_national_id_details",
+        method: "state_treatment.patient_link.get_patient_field_details",
         args: { patient: patient },
         callback(r) {
             // Ignore the answer if another patient was picked while the call was running.
             if (!r.message || frm.doc.patient !== patient) { return; }
-            if (!r.message.field_exists) {
+            Object.entries(r.message.values).forEach(([fieldname, value]) => {
+                frm.set_value(fieldname, value || null);
+            });
+            r.message.missing.forEach((fieldname) => {
                 frappe.msgprint(__(
                     "The Patient doctype has no field {0}. Set the correct fieldname in State Treatment Settings.",
-                    [r.message.fieldname]
+                    [fieldname]
                 ));
-                return;
-            }
-            frm.set_value("national_id", r.message.national_id || null);
+            });
         },
     });
 }

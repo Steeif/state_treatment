@@ -1,0 +1,15 @@
+{
+  "doctype": "DocType",
+  "name": "State Treatment Patient Field",
+  "module": "State Treatment",
+  "custom": 0,
+  "istable": 1,
+  "editable_grid": 1,
+  "engine": "InnoDB",
+  "field_order": ["form_field", "patient_field"],
+  "fields": [
+    {"fieldname": "form_field", "fieldtype": "Data", "label": "Form Field", "reqd": 1, "in_list_view": 1, "description": "Field on State Treatment Recommendation to fill, for example national_id."},
+    {"fieldname": "patient_field", "fieldtype": "Data", "label": "Patient Field", "reqd": 1, "in_list_view": 1, "description": "Fieldname on Patient that holds the value, for example the card number field."}
+  ],
+  "permissions": []
+}

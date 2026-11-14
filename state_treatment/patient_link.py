@@ -7,7 +7,7 @@ import frappe
 from frappe import _
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
-from state_treatment.settings import get_patient_national_id_field
+from state_treatment.settings import get_patient_field_map
 
 RECOMMENDATION = "State Treatment Recommendation"
 
@@ -56,30 +56,37 @@ def ensure_patient_fields():
     frappe.clear_cache(doctype="Patient")
 
 
-def get_patient_national_id(patient):
-    """Return the patient's national ID, or None if the site has no such field."""
-    fieldname = get_patient_national_id_field()
-    if not patient or not frappe.get_meta("Patient").has_field(fieldname):
-        return None
-    return frappe.db.get_value("Patient", patient, fieldname)
+def get_patient_mapped_values(patient):
+    """Return ({request field: value}, [Patient fieldnames this site does not have]).
+
+    The mapping comes from State Treatment Settings. A Patient field that is
+    missing on this site gives None and is listed in the second value, so the
+    form can report it.
+    """
+    meta = frappe.get_meta("Patient")
+    values, missing = {}, []
+    for form_field, patient_field in get_patient_field_map():
+        if not patient:
+            values[form_field] = None
+        elif meta.has_field(patient_field):
+            values[form_field] = frappe.db.get_value("Patient", patient, patient_field)
+        else:
+            values[form_field] = None
+            missing.append(patient_field)
+    return values, missing
 
 
 @frappe.whitelist()
-def get_patient_national_id_details(patient):
-    """Called by the treatment request form when a patient is picked.
+def get_patient_field_details(patient):
+    """Called by the treatment request form when its patient changes.
 
-    Tells the form whether the configured Patient field exists on this site,
-    so a missing field is reported instead of silently leaving the ID blank.
+    Returns the mapped values and the Patient fields this site lacks, so the
+    form can report them instead of leaving a blank with no explanation.
     """
-    if not patient or not frappe.has_permission("Patient", "read"):
+    if patient and not frappe.has_permission("Patient", "read"):
         frappe.throw(_("You do not have permission to read this patient."))
-    fieldname = get_patient_national_id_field()
-    field_exists = frappe.get_meta("Patient").has_field(fieldname)
-    return {
-        "fieldname": fieldname,
-        "field_exists": field_exists,
-        "national_id": frappe.db.get_value("Patient", patient, fieldname) if field_exists else None,
-    }
+    values, missing = get_patient_mapped_values(patient)
+    return {"values": values, "missing": missing}
 
 
 def get_patient_summary(patient, exclude=None):

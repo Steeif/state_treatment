@@ -1,28 +1,28 @@
 # State Treatment
 
-State Treatment helps a healthcare team manage requests for state-funded treatment in one place. Staff can record a request, follow it through review and approval, print its form, and link a Sales Invoice to the approved treatment items.
+State Treatment helps a healthcare team manage requests for state-funded treatment in one place. Staff record a request, follow it through review and approval, print its form, record procedures and medicine doses on approved requests, and link a Sales Invoice to the approved treatment items.
 
 **It supports the administrative process; it does not recommend or decide medical treatment.**
 
 ## Who Does What
 
-- **Administrative Reviewer:** Creates the request for an existing patient, fills in its details, and records administrative letters when more information is needed.
-- **Medical Reviewer:** Reviews requests at the committee stage and resumes review after requested information is recorded.
+- **Administrative Reviewer:** Creates the request for an existing patient. The patient details configured in Settings fill in automatically. Records administrative letters when more information is needed.
+- **Medical Reviewer:** Reviews requests at the committee stage and resumes review after requested information is recorded. On an approved request, marks each procedure as done.
 - **General Manager:** Makes the recommendation decision and moves approved requests through hospital-file review and disbursement approval.
-- **Treatment Pharmacist:** Marks scheduled medicine doses as dispensed; the system records the user and timestamp.
+- **Treatment Pharmacist:** On an approved request, dispenses scheduled medicine doses. The system records the user and time.
 
-In this release, hospital-file review is a step completed by the General Manager; there is no separate Hospital role.
+In this release, hospital-file review is a step completed by the General Manager; there is no separate Hospital role. **Treatment Completed** is set by the system when an approved request is fully treated. No one selects it.
 
 ## Using the System
 
-Before you begin, make sure the patient already exists in Healthcare and the system administrator has loaded the treatment catalog and its prices. Sign in with the role assigned to you. You will work with a **State Treatment Recommendation** record, which follows the approval workflow described below.
+Before you begin, make sure the patient already exists in Healthcare, the administrator has loaded the treatment catalog and prices, and the **Patient Field Map** in State Treatment Settings points to Patient fields that exist on the site. Sign in with the role assigned to you. You will work with a **State Treatment Recommendation** record, which follows the approval workflow below.
 
 ### Workflow Graph
 
 ```mermaid
 flowchart TD
     A([Start]) --> B["1. Admin Reviewer<br/>Open State Treatment Recommendation<br/>Choose New"]
-    B --> C["Choose the patient<br/>Add treatment items<br/>Save the request"]
+    B --> C["Choose the patient<br/>Mapped Patient details fill in<br/>Add treatment items<br/>Save the request"]
     C --> D["Saved as Draft"]
     D --> E["2. Medical Reviewer<br/>Choose Submit for Committee Review"]
     E --> F["Request is in committee review"]
@@ -36,13 +36,30 @@ flowchart TD
     K --> L["General Manager<br/>Choose Approve for Disbursement"]
     L --> M["6. Sales Invoice<br/>Link the request<br/>Use only items on that request"]
     M --> N["Submit the invoice<br/>Only after disbursement approval"]
+    L --> T["7. Treatment Actions on the approved request<br/>Medical Reviewer: Mark Procedure Done<br/>Treatment Pharmacist: Dispense Dose"]
+    T --> R{"Every procedure done and every dose dispensed?"}
+    R -->|No| T
+    R -->|Yes| S["Status: Treatment Completed<br/>set automatically"]
 ```
 
-### Medicine Dose Scheduling and Dispensing
+The graph shows the approval steps. Treatment on an approved request uses the **Treatment Actions** menu described below.
 
-For each medicine protocol item, set its **First Dose Date** on that specific request row. Medicine name, number of doses, and interval are read from the protocol catalog; procedures do not create dose schedules. When the request reaches **Approved for Disbursement**, the app creates one dose row per prescribed dose, with dates calculated from the first dose date and protocol interval. The medical team can adjust scheduled dates.
+### Procedures and Medicine Doses
 
-Schedules are linked to the individual request-item row, so duplicate medicines remain distinct. Re-saving an unchanged approved request does not duplicate its schedule. If the regimen or start date changes after approval, a new numbered schedule version is appended; prior dose and dispensing records remain. The Dose Dispensing Summary reports how many doses are dispensed and remain in the current schedule. Pharmacists can mark doses dispensed; the system records their user and the time automatically. Procedures do not generate doses and can be tracked separately if needed.
+For each medicine protocol item, set its **First Dose Date** on that request row. Medicine name, number of doses and interval come from the protocol catalog. When the request reaches **Approved for Disbursement**, the app creates one dose row per prescribed dose, with dates calculated from the first dose date and the protocol interval. The medical team can adjust scheduled dates. A change to a medicine's regimen or start date after approval creates a new numbered schedule version. Earlier doses and dispensing records remain.
+
+Schedules are linked to the individual request-item row, so duplicate medicines stay distinct. Re-saving an unchanged approved request does not duplicate its schedule.
+
+On an approved request, use **Treatment Actions** in the form menu:
+
+- **Dispense Dose** (Treatment Pharmacist): choose one undispensed dose from the current schedule. Each action dispenses one dose. The system records the user and time. A dispensed dose cannot be reverted.
+- **Mark Procedure Done** (Medical Reviewer): choose a procedure that has not been performed. Each procedure is marked once. The system records the user and time. It cannot be reverted. Procedures do not create dose rows. Multi-session procedures, such as radiation given over several sessions, are not modelled yet.
+
+Both actions ask for confirmation, and the form must be saved before either one runs.
+
+The **Treatment Summary** lists, for each medicine, how many doses are dispensed and how many remain. For each procedure, it shows whether the procedure has been performed.
+
+When every procedure is done and every dose in the current schedule is dispensed, the request's status changes to **Treatment Completed** automatically.
 
 ## For System Administrators
 
@@ -73,6 +90,16 @@ bench --site [site-name] install-app state_treatment
 bench restart
 ```
 
+Installation adds the default Patient Field Map row (National ID) to State Treatment Settings.
+
+### Upgrade
+
+```bash
+bench --site [site-name] migrate
+```
+
+On an existing site, this adds the default Patient Field Map row once, if the map is empty. It does not change any row an administrator has already set.
+
 ### Load the Treatment Catalog
 
 The treatment catalog is restricted data and is intentionally not included in this public repository. Installation does not load it. An authorized administrator must securely provision the JSON file and run the importer on the target site.
@@ -83,17 +110,36 @@ bench --site [site-name] execute state_treatment.patches.v1_0.import_breast_canc
 
 The default file path is `state_treatment/data/breast_cancer_protocols.json`; that file is ignored by Git. The catalog and patient records must not be committed to this repository. The administrator should verify the imported protocol items and prices on the site.
 
+### State Treatment Settings
+
+Open **State Treatment Settings**. Only the System Manager role can change it.
+
+- **State-funded Price List:** the EGP price list that holds protocol prices. It is created automatically if it does not exist. Default: نفقة الدولة.
+- **Patient Field Map:** copies values from the Patient record into request fields. Each row has:
+  - **Form Field:** the request field to fill, for example `national_id`.
+  - **Patient Field:** the Patient fieldname that holds the value, for example the custom card-number field `رقم_البطاقة`.
+
+The default row fills `national_id` from `رقم_البطاقة`. Values are copied when a patient is picked. They are also copied on save into any mapped field that is empty, and into every mapped field when the patient changes. Pharmacist saves never copy Patient values.
+
+Rules for the map:
+
+- A Form Field must be a request field that can hold a value. Layout fields, tables, Patient, and Status are rejected.
+- If a Patient Field does not exist on the site, the form shows a message and leaves that request field blank. The app never creates Patient fields. Create the field on Patient, or correct its name in the map.
+- To fill another request field from the Patient, add a row. No code change is needed.
+
 ## Protocol Items
 
-Create protocol records manually from **Item**. Check **Is Protocol**, then choose **Medicine** or **Procedure**. Medicine records require a medicine name, treatment duration, and dose count; the dose interval is calculated as duration divided by dose count. Procedure records show the procedure schedule, and duration is not required or used. The Item name can identify the regimen or procedure. Ministry code, notes, and a serial number are stored on the Item. The internal code is built from ministry code, treatment type, and serial.
+Create protocol records manually from **Item**. Check **Is Protocol**, then choose **Medicine** or **Procedure**. Medicine records require a medicine name, treatment duration, and dose count; the dose interval is calculated as duration divided by dose count. Procedure records do not use duration. The Item name can identify the regimen or procedure. Ministry code, notes, and a serial number are stored on the Item. The internal code is built from ministry code, treatment type, and serial.
 
-Protocol price is stored on the Item and synchronized to the **نفقة الدولة** selling price list in EGP so invoices continue to use ERPNext Item Price. Existing imported catalog Items are exposed as protocol records during migration.
+Protocol price is stored on the Item and synchronized to the State-funded Price List in EGP, so invoices continue to use ERPNext Item Price. Existing imported catalog Items are exposed as protocol records during migration.
 
 ## What the App Includes
 
-- A request record with a tracked approval workflow.
-- Automatic, versioned medicine dose schedules generated at final approval and linked to their exact request-item row.
-- Pharmacist dispensing records with user and timestamp, plus an automatic remaining-dose summary.
+- A request record with a tracked approval workflow, and an automatic **Treatment Completed** status.
+- State Treatment Settings for the State-funded Price List and the Patient Field Map.
+- Versioned medicine dose schedules, created at final approval and linked to their exact request-item row.
+- Dispensing and procedure-completion records with user and timestamp, and a Treatment Summary.
 - Administrative letters linked to requests.
-- A printable request form. Confirm its layout matches the official form on the target site before production use.
+- A printable request form. Print formats stay in Arabic. Confirm its layout matches the official form on the target site before production use.
 - A Sales Invoice check that requires an approved-for-disbursement request and limits invoice items to those on that request.
+- Arabic labels, messages and workflow names from `translations/ar.csv`. Field names stay in English.

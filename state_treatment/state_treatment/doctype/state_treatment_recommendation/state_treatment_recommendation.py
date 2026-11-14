@@ -8,7 +8,7 @@ from frappe.model.document import Document
 from frappe.model.naming import make_autoname
 from frappe.utils import cint, flt, formatdate, getdate, now_datetime, nowdate
 
-from state_treatment.patient_link import get_patient_national_id
+from state_treatment.patient_link import get_patient_mapped_values
 from state_treatment.utils import get_protocol_item_price
 
 
@@ -23,7 +23,7 @@ class StateTreatmentRecommendation(Document):
         )
 
     def validate(self):
-        self.fill_national_id()
+        self.fill_patient_fields()
         self.calculate_total()
         self.validate_treatment_doses()
         self.validate_procedure_done()
@@ -31,13 +31,20 @@ class StateTreatmentRecommendation(Document):
         self.complete_treatment_if_done()
         self.update_dose_summary()
 
-    def fill_national_id(self):
-        """Copy the patient's national ID when this is empty, or when the patient changes."""
-        if not self.patient:
+    def fill_patient_fields(self):
+        """Copy the mapped Patient values into the request.
+
+        A field is filled when it is empty. When the patient changes, every
+        mapped field is refilled. Treatment Pharmacists never trigger a copy:
+        their saves change dispensing only.
+        """
+        if not self.patient or self._is_pharmacist_only():
             return
-        if self.national_id and not self.has_value_changed("patient"):
-            return
-        self.national_id = get_patient_national_id(self.patient)
+        patient_changed = self.has_value_changed("patient")
+        values, _missing = get_patient_mapped_values(self.patient)
+        for form_field, value in values.items():
+            if patient_changed or not self.get(form_field):
+                self.set(form_field, value)
 
     def validate_treatment_doses(self):
         previous_doc = self.get_doc_before_save()

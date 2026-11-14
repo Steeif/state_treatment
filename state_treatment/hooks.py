@@ -5,6 +5,7 @@ app_description = "State-funded treatment recommendations"
 app_email = ""
 app_license = "MIT"
 required_apps = ["erpnext", "healthcare"]
+after_install = "state_treatment.settings.after_install"
 
 after_migrate = [
     "state_treatment.settings.ensure_settings",
