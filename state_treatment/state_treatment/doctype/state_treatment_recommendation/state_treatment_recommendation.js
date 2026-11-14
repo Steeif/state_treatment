@@ -136,8 +136,8 @@ function add_treatment_buttons(frm) {
     if (roles.includes("General Manager") || is_system_manager) {
         if (frm.doc.status === "Approved for Disbursement" && treatment_is_finished(frm.doc)) {
             frm.add_custom_button(
-                __("Complete Treatment"),
-                () => complete_treatment(frm),
+                __("Close Treatment"),
+                () => close_treatment(frm),
                 __("Treatment Actions")
             );
         }
@@ -255,18 +255,18 @@ function treatment_is_finished(doc) {
     });
 }
 
-function complete_treatment(frm) {
+function close_treatment(frm) {
     if (frm.is_dirty()) {
         frappe.msgprint(__("Save the form before continuing."));
         return;
     }
     frappe.confirm(__("This cannot be undone. Continue?"), () => {
         frappe.call({
-            method: "state_treatment.actions.complete_treatment",
+            method: "state_treatment.actions.close_treatment",
             args: { recommendation: frm.doc.name },
             freeze: true,
             callback() {
-                frappe.show_alert({ message: __("Treatment completed."), indicator: "green" });
+                frappe.show_alert({ message: __("Treatment closed."), indicator: "green" });
                 frm.reload_doc();
             },
         });

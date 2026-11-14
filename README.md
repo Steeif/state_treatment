@@ -8,10 +8,10 @@ State Treatment helps a healthcare team manage requests for state-funded treatme
 
 - **Administrative Reviewer:** Creates the request for an existing patient. The patient details configured in Settings fill in automatically. Records administrative letters when more information is needed.
 - **Medical Reviewer:** Reviews requests at the committee stage and resumes review after requested information is recorded. On an approved request, marks each procedure as done.
-- **General Manager:** Makes the recommendation decision and moves approved requests through hospital-file review and disbursement approval. Completes the treatment with **Complete Treatment** once every procedure is done and every dose is dispensed.
+- **General Manager:** Makes the recommendation decision and moves approved requests through hospital-file review and disbursement approval. Closes the treatment with **Close Treatment** once every procedure is done and every dose is dispensed.
 - **Treatment Pharmacist:** On an approved request, dispenses scheduled medicine doses. The system records the user and time.
 
-In this release, hospital-file review is a step completed by the General Manager; there is no separate Hospital role. **Treatment Completed** is set only by the General Manager's **Complete Treatment** action, and only once the treatment is fully done.
+In this release, hospital-file review is a step completed by the General Manager; there is no separate Hospital role. **Treatment Completed** is set only by the General Manager's **Close Treatment** action, and only once the treatment is fully done.
 
 ## Using the System
 
@@ -39,7 +39,7 @@ flowchart TD
     L --> T["7. Treatment Actions on the approved request<br/>Medical Reviewer: Mark Procedure Done<br/>Treatment Pharmacist: Dispense Dose"]
     T --> R{"Every procedure done and every dose dispensed?"}
     R -->|No| T
-    R -->|Yes| S["General Manager<br/>Choose Complete Treatment"]
+    R -->|Yes| S["General Manager<br/>Choose Close Treatment"]
     S --> Z["Status: Treatment Completed"]
 ```
 
@@ -55,13 +55,13 @@ On an approved request, use **Treatment Actions** in the form menu:
 
 - **Dispense Dose** (Treatment Pharmacist): choose one undispensed dose from the current schedule. Each action dispenses one dose. The system records the user and time. A dispensed dose cannot be reverted.
 - **Mark Procedure Done** (Medical Reviewer): choose a procedure that has not been performed. Each procedure is marked once. The system records the user and time. It cannot be reverted. Procedures do not create dose rows. Multi-session procedures, such as radiation given over several sessions, are not modelled yet.
-- **Complete Treatment** (General Manager): available only when every procedure is done and every dose is dispensed. It changes the status to **Treatment Completed**.
+- **Close Treatment** (General Manager): available only when every procedure is done and every dose is dispensed. It changes the status to **Treatment Completed**.
 
 The actions ask for confirmation, and the form must be saved before any of them runs.
 
 The **Treatment Summary** lists, for each medicine, how many doses are dispensed and how many remain. For each procedure, it shows whether the procedure has been performed.
 
-When every procedure is done and every dose in the current schedule is dispensed, the General Manager can use **Complete Treatment**. Using it changes the request's status to **Treatment Completed**.
+When every procedure is done and every dose in the current schedule is dispensed, the General Manager can use **Close Treatment**. Using it changes the request's status to **Treatment Completed**.
 
 ## For System Administrators
 
@@ -102,7 +102,7 @@ bench --site [site-name] migrate
 
 On an existing site, this adds the default Patient Field Map row once, if the map is empty. It does not change any row an administrator has already set.
 
-Version 0.3.0 changes how a treatment is completed. The status is no longer set automatically when the last dose is dispensed. The General Manager uses **Complete Treatment** instead.
+Version 0.3.0 changes how a treatment is completed. The status is no longer set automatically when the last dose is dispensed. The General Manager uses **Close Treatment** instead.
 
 ### Load the Treatment Catalog
 
@@ -139,7 +139,7 @@ Protocol price is stored on the Item and synchronized to the State-funded Price 
 
 ## What the App Includes
 
-- A request record with a tracked approval workflow, and a **Treatment Completed** status set by the General Manager's Complete Treatment action.
+- A request record with a tracked approval workflow, and a **Treatment Completed** status set by the General Manager's Close Treatment action.
 - State Treatment Settings for the State-funded Price List and the Patient Field Map.
 - Versioned medicine dose schedules, created at final approval and linked to their exact request-item row.
 - Dispensing and procedure-completion records with user and timestamp, and a Treatment Summary.

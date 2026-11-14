@@ -20,8 +20,8 @@ from state_treatment.state_treatment.doctype.state_treatment_recommendation.stat
 DOCTYPE = "State Treatment Recommendation"
 PROCEDURE_ROLES = ("Medical Reviewer", "System Manager")
 PHARMACIST_ROLES = ("Treatment Pharmacist", "System Manager")
-COMPLETE_ROLES = ("General Manager", "System Manager")
-COMPLETE_ACTION = "Complete Treatment"
+CLOSE_ROLES = ("General Manager", "System Manager")
+CLOSE_ACTION = "Close Treatment"
 
 
 @frappe.whitelist()
@@ -86,12 +86,12 @@ def _latest_version(doses, protocol_item):
 
 
 @frappe.whitelist()
-def complete_treatment(recommendation):
+def close_treatment(recommendation):
     """Move an approved request to Treatment Completed through its workflow transition."""
-    _require_role(COMPLETE_ROLES, _("Only the General Manager can complete a treatment."))
+    _require_role(CLOSE_ROLES, _("Only the General Manager can close a treatment."))
     doc = frappe.get_doc(DOCTYPE, recommendation)
     doc.check_permission("read")
     if not doc.is_treatment_finished():
-        frappe.throw(_("Every procedure must be done and every dose dispensed before the treatment can be completed."))
-    apply_workflow(doc, COMPLETE_ACTION)
+        frappe.throw(_("Every procedure must be done and every dose dispensed before the treatment can be closed."))
+    apply_workflow(doc, CLOSE_ACTION)
     return {"status": doc.status}

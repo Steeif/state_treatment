@@ -106,7 +106,7 @@
    },
    {
     "state": "Approved for Disbursement",
-    "action": "Complete Treatment",
+    "action": "Close Treatment",
     "next_state": "Treatment Completed",
     "allowed": "General Manager"
    },
