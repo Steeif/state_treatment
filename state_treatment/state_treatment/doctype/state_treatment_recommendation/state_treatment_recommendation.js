@@ -21,6 +21,8 @@ frappe.ui.form.on("State Treatment Recommendation", {
             }
             grid.refresh();
         }
+
+        add_treatment_buttons(frm);
     },
 
     patient(frm) {
@@ -96,4 +98,136 @@ function recalc_total(frm) {
         total += flt(row.rate);
     });
     frm.set_value("total_amount", total);
+}
+
+function add_treatment_buttons(frm) {
+    frm.clear_custom_buttons();
+    if (frm.is_new()) {
+        return;
+    }
+    if (!["Approved for Disbursement", "Treatment Completed"].includes(frm.doc.status)) {
+        return;
+    }
+
+    const roles = frappe.user_roles || [];
+    const is_system_manager = roles.includes("System Manager");
+
+    if (roles.includes("Medical Reviewer") || is_system_manager) {
+        const pending = (frm.doc.protocol_items || []).filter(
+            (row) => row.treatment_type === "Procedure" && !row.procedure_done
+        );
+        if (pending.length) {
+            frm.add_custom_button(
+                __("Mark Procedure Done"),
+                () => open_procedure_dialog(frm, pending),
+                __("Treatment Actions")
+            );
+        }
+    }
+
+    if (roles.includes("Treatment Pharmacist") || is_system_manager) {
+        const doses = doses_to_dispense(frm.doc);
+        if (doses.length) {
+            frm.add_custom_button(
+                __("Dispense Dose"),
+                () => open_dispense_dialog(frm, doses),
+                __("Treatment Actions")
+            );
+        }
+    }
+}
+
+function doses_to_dispense(doc) {
+    // Only the latest schedule version can be dispensed; older versions are kept for history.
+    const doses = doc.treatment_doses || [];
+    const latest = {};
+    doses.forEach((dose) => {
+        const version = Number(dose.schedule_version) || 0;
+        if (version > (latest[dose.protocol_item] || 0)) {
+            latest[dose.protocol_item] = version;
+        }
+    });
+    return doses
+        .filter((dose) => !dose.dispensed && (Number(dose.schedule_version) || 0) === latest[dose.protocol_item])
+        .sort((a, b) => (a.scheduled_date || "").localeCompare(b.scheduled_date || "") || a.idx - b.idx);
+}
+
+function open_procedure_dialog(frm, procedures) {
+    if (frm.is_dirty()) {
+        frappe.msgprint(__("Save the form before continuing."));
+        return;
+    }
+    const options = procedures.map((row) => `${row.idx}. ${row.item_name || row.item}`);
+    const dialog = new frappe.ui.Dialog({
+        title: __("Mark Procedure Done"),
+        fields: [{
+            fieldname: "procedure",
+            label: __("Procedure"),
+            fieldtype: "Select",
+            options: options.join("\n"),
+            default: options[0],
+            reqd: 1,
+        }],
+        primary_action_label: __("Confirm"),
+        primary_action(values) {
+            const row = procedures[options.indexOf(values.procedure)];
+            dialog.hide();
+            frappe.confirm(__("This cannot be undone. Continue?"), () => {
+                run_treatment_action(
+                    frm,
+                    "state_treatment.actions.mark_procedure_done",
+                    row.name,
+                    __("Procedure marked as done.")
+                );
+            });
+        },
+    });
+    dialog.show();
+}
+
+function open_dispense_dialog(frm, doses) {
+    if (frm.is_dirty()) {
+        frappe.msgprint(__("Save the form before continuing."));
+        return;
+    }
+    const options = doses.map((dose) => (
+        `${dose.idx}. ${dose.medicine_name || dose.item} - ${dose.dose} - ${frappe.format(dose.scheduled_date, { fieldtype: "Date" })}`
+    ));
+    const dialog = new frappe.ui.Dialog({
+        title: __("Dispense Dose"),
+        fields: [{
+            fieldname: "dose",
+            label: __("Dose"),
+            fieldtype: "Select",
+            options: options.join("\n"),
+            default: options[0],
+            reqd: 1,
+        }],
+        primary_action_label: __("Confirm"),
+        primary_action(values) {
+            const dose = doses[options.indexOf(values.dose)];
+            dialog.hide();
+            frappe.confirm(__("This cannot be undone. Continue?"), () => {
+                run_treatment_action(
+                    frm,
+                    "state_treatment.actions.mark_dose_dispensed",
+                    dose.name,
+                    __("Dose marked as dispensed.")
+                );
+            });
+        },
+    });
+    dialog.show();
+}
+
+function run_treatment_action(frm, method, row_name, success_message) {
+    frappe.call({
+        method: method,
+        args: { recommendation: frm.doc.name, row_name: row_name },
+        freeze: true,
+        callback() {
+            frappe.show_alert({ message: success_message, indicator: "green" });
+            frm.reload_doc();
+        },
+    });
 }
