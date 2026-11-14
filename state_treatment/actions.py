@@ -10,6 +10,7 @@ The normal validate() chain still runs on every save.
 import frappe
 from frappe import _
 from frappe.utils import cint
+from frappe.model.workflow import apply_workflow
 
 from state_treatment.state_treatment.doctype.state_treatment_recommendation.state_treatment_recommendation import (
     APPROVED_STATUS,
@@ -19,6 +20,8 @@ from state_treatment.state_treatment.doctype.state_treatment_recommendation.stat
 DOCTYPE = "State Treatment Recommendation"
 PROCEDURE_ROLES = ("Medical Reviewer", "System Manager")
 PHARMACIST_ROLES = ("Treatment Pharmacist", "System Manager")
+COMPLETE_ROLES = ("General Manager", "System Manager")
+COMPLETE_ACTION = "Complete Treatment"
 
 
 @frappe.whitelist()
@@ -80,3 +83,15 @@ def _latest_version(doses, protocol_item):
         (cint(dose.schedule_version) for dose in doses if dose.protocol_item == protocol_item),
         default=0,
     )
+
+
+@frappe.whitelist()
+def complete_treatment(recommendation):
+    """Move an approved request to Treatment Completed through its workflow transition."""
+    _require_role(COMPLETE_ROLES, _("Only the General Manager can complete a treatment."))
+    doc = frappe.get_doc(DOCTYPE, recommendation)
+    doc.check_permission("read")
+    if not doc.is_treatment_finished():
+        frappe.throw(_("Every procedure must be done and every dose dispensed before the treatment can be completed."))
+    apply_workflow(doc, COMPLETE_ACTION)
+    return {"status": doc.status}

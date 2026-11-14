@@ -105,6 +105,12 @@
     "allowed": "General Manager"
    },
    {
+    "state": "Approved for Disbursement",
+    "action": "Complete Treatment",
+    "next_state": "Treatment Completed",
+    "allowed": "General Manager"
+   },
+   {
     "state": "File Reviewed at Hospital",
     "action": "Reject",
     "next_state": "Rejected",

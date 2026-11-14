@@ -28,7 +28,6 @@ class StateTreatmentRecommendation(Document):
         self.validate_treatment_doses()
         self.validate_procedure_done()
         self.sync_dose_schedule()
-        self.complete_treatment_if_done()
         self.update_dose_summary()
 
     def fill_patient_fields(self):
@@ -353,12 +352,7 @@ class StateTreatmentRecommendation(Document):
             row.procedure_done_by = frappe.session.user
             row.procedure_done_on = now_datetime()
 
-    def complete_treatment_if_done(self):
-        """Move an approved request to Treatment Completed once every dose is dispensed and every procedure is done."""
-        if self.status == APPROVED_STATUS and self._treatment_is_finished():
-            self.status = COMPLETED_STATUS
-
-    def _treatment_is_finished(self):
+    def is_treatment_finished(self):
         active = [row for row in self.protocol_items if row.item]
         if not active:
             return False

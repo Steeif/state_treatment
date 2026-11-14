@@ -132,6 +132,16 @@ function add_treatment_buttons(frm) {
             );
         }
     }
+
+    if (roles.includes("General Manager") || is_system_manager) {
+        if (frm.doc.status === "Approved for Disbursement" && treatment_is_finished(frm.doc)) {
+            frm.add_custom_button(
+                __("Complete Treatment"),
+                () => complete_treatment(frm),
+                __("Treatment Actions")
+            );
+        }
+    }
 }
 
 function doses_to_dispense(doc) {
@@ -226,5 +236,39 @@ function run_treatment_action(frm, method, row_name, success_message) {
             frappe.show_alert({ message: success_message, indicator: "green" });
             frm.reload_doc();
         },
+    });
+}
+
+function treatment_is_finished(doc) {
+    const rows = (doc.protocol_items || []).filter((row) => row.item);
+    if (!rows.length || doses_to_dispense(doc).length) {
+        return false;
+    }
+    return rows.every((row) => {
+        if (row.treatment_type === "Procedure") {
+            return Boolean(row.procedure_done);
+        }
+        if (row.treatment_type === "Medicine") {
+            return (doc.treatment_doses || []).some((dose) => dose.protocol_item === row.name);
+        }
+        return false;
+    });
+}
+
+function complete_treatment(frm) {
+    if (frm.is_dirty()) {
+        frappe.msgprint(__("Save the form before continuing."));
+        return;
+    }
+    frappe.confirm(__("This cannot be undone. Continue?"), () => {
+        frappe.call({
+            method: "state_treatment.actions.complete_treatment",
+            args: { recommendation: frm.doc.name },
+            freeze: true,
+            callback() {
+                frappe.show_alert({ message: __("Treatment completed."), indicator: "green" });
+                frm.reload_doc();
+            },
+        });
     });
 }
