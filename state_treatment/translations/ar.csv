@@ -174,3 +174,8 @@
 "The full text of the letter. Required.","النص الكامل للخطاب. مطلوب.",
 "The healthcare unit that receives this letter.","الوحدة الصحية التي تستلم هذا الخطاب.",
 "The date the letter was issued. Required.","تاريخ إصدار الخطاب. مطلوب.",
+"Request","بيانات الطلب",
+"Summary","الملخص",
+"Dose Schedule","جدول الجرعات",
+"Items and Amount","البنود والمبلغ",
+"Letter","الخطاب",
