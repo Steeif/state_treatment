@@ -65,6 +65,10 @@ def seed_default_patient_map():
         "form_field": "national_id",
         "patient_field": legacy or DEFAULT_NATIONAL_ID_FIELD,
     })
+    # This runs as a patch, before after_migrate. The price list link is validated
+    # on save, so the list must exist first.
+    doc.state_price_list = doc.state_price_list or DEFAULT_PRICE_LIST
+    ensure_price_list(doc.state_price_list)
     doc.save(ignore_permissions=True)
 
 
