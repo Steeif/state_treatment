@@ -1,22 +1,34 @@
 import frappe
+from frappe.utils import flt, nowdate
 
 from state_treatment.settings import get_state_price_list
 
 
 def get_protocol_item_price(item_code):
-    """Return the currently valid ERPNext price for a protocol item."""
-    from erpnext.stock.get_item_details import get_item_price
+    """Return the State price list rate for a protocol item, or 0 when it is not priced.
 
-    uom = frappe.db.get_value("Item", item_code, "stock_uom")
-    prices = get_item_price(
+    Reads Item Price directly. ERPNext's get_item_price needs a larger args dict
+    (batch_no and more) that differs between ERPNext versions, and sync_protocol_price
+    stores protocol prices without a UOM, so a direct match is enough.
+    """
+    rows = frappe.db.sql(
+        """
+        select price_list_rate
+        from `tabItem Price`
+        where item_code = %(item_code)s
+          and price_list = %(price_list)s
+          and (valid_from is null or valid_from <= %(today)s)
+          and (valid_upto is null or valid_upto >= %(today)s)
+        order by valid_from desc, modified desc
+        limit 1
+        """,
         {
+            "item_code": item_code,
             "price_list": get_state_price_list(),
-            "uom": uom,
-            "transaction_date": frappe.utils.nowdate(),
+            "today": nowdate(),
         },
-        item_code,
     )
-    return prices[0][1] if prices else 0
+    return flt(rows[0][0]) if rows else 0
 
 
 @frappe.whitelist()
