@@ -12,6 +12,7 @@ after_migrate = [
     "state_treatment.item_protocol.ensure_item_protocol_fields",
     "state_treatment.patient_link.ensure_patient_fields",
     "state_treatment.patient_link.backfill_patient_summaries",
+    "state_treatment.print_formats.ensure_print_formats",
 ]
 
 scheduler_events = {
