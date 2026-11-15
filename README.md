@@ -102,6 +102,7 @@ Installation adds the default Patient Field Map row (National ID) to State Treat
 
 ```bash
 bench --site [site-name] migrate
+bench build --app state_treatment
 ```
 
 On an existing site, this adds the default Patient Field Map row once, if the map is empty. It does not change any row an administrator has already set.
