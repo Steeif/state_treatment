@@ -74,6 +74,15 @@ def validate_rows(rows):
             frappe.throw(_("Amount must be a non-negative number in row {0}.").format(row["serial"]))
         if isinstance(duration, bool) or not isinstance(duration, int) or duration < 0:
             frappe.throw(_("Duration must be a non-negative integer in row {0}.").format(row["serial"]))
+        treatment_type = row.get("treatment_type", "Procedure")
+        if treatment_type not in ("Medicine", "Procedure"):
+            frappe.throw(_("Treatment type must be Medicine or Procedure in row {0}.").format(row["serial"]))
+        if treatment_type == "Medicine":
+            doses = row.get("number_of_doses")
+            if isinstance(doses, bool) or not isinstance(doses, int) or doses < 1:
+                frappe.throw(_("Medicine row {0} needs a positive number of doses.").format(row["serial"]))
+            if duration < 1 or not row.get("medicine_name"):
+                frappe.throw(_("Medicine row {0} needs a duration and a medicine name.").format(row["serial"]))
 
 
 def ensure_custom_fields():
@@ -112,6 +121,11 @@ def ensure_item_group(diagnosis_group):
 def import_item(row):
     item_code = "{0}-{1}".format(row["protocol_code"], row["serial"])
     amount = row["amount_egp"]
+    treatment_type = row.get("treatment_type", "Procedure")
+    is_medicine = treatment_type == "Medicine"
+    doses = row.get("number_of_doses") if is_medicine else None
+    dose_interval = round(row["duration_days"] / doses, 2) if is_medicine else 0
+    type_code = "MED" if is_medicine else "PROC"
 
     if frappe.db.exists("Item", item_code):
         existing_code = frappe.db.get_value("Item", item_code, "official_protocol_code")
@@ -124,11 +138,15 @@ def import_item(row):
             "is_protocol": 1,
             "protocol_treatment_type": "Procedure",
             "protocol_serial": row["serial"],
-            "internal_protocol_code": "{0}-PROC-{1:05d}".format(row["protocol_code"], row["serial"]),
+            "internal_protocol_code": "{0}-{1}-{2:05d}".format(row["protocol_code"], type_code, row["serial"]),
             "protocol_price": amount,
             "duration_days": row["duration_days"],
             "decision_sequence": row.get("decision_sequence"),
             "diagnosis_group": row["diagnosis_group"],
+            "protocol_treatment_type": treatment_type,
+            "medicine_name": row.get("medicine_name") if is_medicine else None,
+            "number_of_doses": doses,
+            "dose_interval_days": dose_interval,
         })
         upsert_price(item_code, amount)
         return
@@ -145,13 +163,16 @@ def import_item(row):
         include_item_in_manufacturing=0,
         official_protocol_code=row["protocol_code"],
         is_protocol=1,
-        protocol_treatment_type="Procedure",
+        protocol_treatment_type=treatment_type,
         protocol_serial=row["serial"],
-        internal_protocol_code="{0}-PROC-{1:05d}".format(row["protocol_code"], row["serial"]),
+        internal_protocol_code="{0}-{1}-{2:05d}".format(row["protocol_code"], type_code, row["serial"]),
         protocol_price=amount,
         duration_days=row["duration_days"],
         decision_sequence=row.get("decision_sequence"),
         diagnosis_group=row["diagnosis_group"],
+        medicine_name=row.get("medicine_name") if is_medicine else None,
+        number_of_doses=doses,
+        dose_interval_days=dose_interval,
     ))
     item.insert(ignore_permissions=True)
     upsert_price(item_code, amount)
