@@ -3,3 +3,4 @@
 
 [post_model_sync]
 state_treatment.patches.v0_2.seed_patient_field_map
+state_treatment.patches.v0_3.merge_removed_states
