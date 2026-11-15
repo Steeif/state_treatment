@@ -49,5 +49,5 @@ fixtures = [
     {"dt": "Role", "filters": [["name", "in", ["Admin Reviewer", "Medical Reviewer", "General Manager", "Treatment Pharmacist"]]]},
     {"dt": "Workflow State", "filters": [["name", "in", ["Draft", "Under Committee Review", "Administrative Letter", "Recommendation Approved", "File Reviewed at Hospital", "Approved for Disbursement", "Rejected", "Treatment Completed"]]]},
     {"dt": "Workflow", "filters": [["name", "=", "State Treatment Recommendation Workflow"]]},
-    {"dt": "Print Format", "filters": [["name", "=", "Recommendation Official Form"]]},
+    {"dt": "Print Format", "filters": [["name", "in", ["Recommendation Official Form", "Administrative Letter Official Form"]]]},
 ]
