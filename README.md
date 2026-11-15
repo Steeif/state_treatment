@@ -91,6 +91,8 @@ The State-funded selling price list must use EGP and each protocol Item must hav
 
 ```bash
 bench --site [site-name] install-app state_treatment
+bench --site [site-name] migrate
+bench build --app state_treatment
 bench restart
 ```
 

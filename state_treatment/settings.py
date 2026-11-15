@@ -71,3 +71,9 @@ def seed_default_patient_map():
 def after_install():
     ensure_settings()
     seed_default_patient_map()
+    # install-app does not run the after_migrate hooks, so create the same fields here.
+    from state_treatment.item_protocol import ensure_item_protocol_fields
+    from state_treatment.patient_link import ensure_patient_fields
+
+    ensure_item_protocol_fields()
+    ensure_patient_fields()
