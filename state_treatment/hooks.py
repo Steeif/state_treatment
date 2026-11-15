@@ -14,6 +14,10 @@ after_migrate = [
     "state_treatment.patient_link.backfill_patient_summaries",
 ]
 
+scheduler_events = {
+    "daily": ["state_treatment.reminders.send_upcoming_reminders"],
+}
+
 override_doctype_dashboards = {
     "Patient": "state_treatment.patient_link.get_patient_dashboard_data",
 }

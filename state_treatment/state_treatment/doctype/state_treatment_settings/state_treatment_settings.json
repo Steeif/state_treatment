@@ -13,7 +13,11 @@
   "field_order": ["state_price_list", "patient_field_map"],
   "fields": [
     {"fieldname": "state_price_list", "fieldtype": "Link", "label": "State-funded Price List", "options": "Price List", "reqd": 1, "default": "نفقة الدولة", "description": "Price list (EGP) that holds the protocol prices. Created automatically if it does not exist."},
-    {"fieldname": "patient_field_map", "fieldtype": "Table", "label": "Patient Field Map", "options": "State Treatment Patient Field", "description": "Copies values from the Patient record into request fields. Set the Form Field and the Patient Field for each row."}
+    {"fieldname": "patient_field_map", "fieldtype": "Table", "label": "Patient Field Map", "options": "State Treatment Patient Field", "description": "Copies values from the Patient record into request fields. Set the Form Field and the Patient Field for each row."},
+    {"fieldname": "reminders_section", "fieldtype": "Section Break", "label": "Reminders"},
+    {"fieldname": "reminders_enabled", "fieldtype": "Check", "label": "Send Reminders", "default": "1", "description": "Turns the reminder job on or off."},
+    {"fieldname": "reminder_days_before", "fieldtype": "Int", "label": "Days Before Each Date", "default": "2", "reqd": 1, "description": "Reminders are sent this many days before each dose or appointment date."},
+    {"fieldname": "reminder_recipients", "fieldtype": "Table", "label": "Reminder Recipients", "options": "State Treatment Reminder Recipient", "description": "Staff who receive each reminder by email, in addition to the patient."}
   ],
   "permissions": [
     {"role": "System Manager", "read": 1, "write": 1, "create": 1, "print": 1}

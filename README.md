@@ -142,6 +142,15 @@ Create protocol records manually from **Item**. Check **Is Protocol**, then choo
 
 Protocol price is stored on the Item and synchronized to the State-funded Price List in EGP, so invoices continue to use ERPNext Item Price. Existing imported catalog Items are exposed as protocol records during migration.
 
+## Reminders
+
+A daily job reminds the patient, and the users listed in **State Treatment Settings → Reminder Recipients**, about each treatment dose and each appointment that falls within the reminder window. The window is **Days Before Each Date**, 2 days by default. Each dose or appointment is reminded once.
+
+- The patient gets an email when the Patient record has an email address, and an SMS when it has a mobile number and SMS Settings is configured.
+- The reminder recipients get an email with the patient's name and the recommendation number.
+- Add important appointments, such as procedures and follow-up visits, under **Appointments** on the recommendation.
+- Requirements: the scheduler must be enabled (`bench --site [site-name] enable-scheduler`), and an outgoing Email Account must be set up. Emails are queued in **Email Queue**. Check there if a reminder did not arrive.
+
 ## What the App Includes
 
 - A request record with a tracked approval workflow, and a **Treatment Completed** status set by the General Manager's Close Treatment action.

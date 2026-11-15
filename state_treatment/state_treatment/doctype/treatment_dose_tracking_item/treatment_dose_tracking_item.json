@@ -16,7 +16,8 @@
     {"fieldname": "dispensed_on", "fieldtype": "Datetime", "label": "Dispensed On", "read_only": 1},
     {"fieldname": "protocol_item", "fieldtype": "Data", "label": "Request Item Row", "read_only": 1, "hidden": 1},
     {"fieldname": "schedule_version", "fieldtype": "Int", "label": "Schedule Version", "read_only": 1, "in_list_view": 1, "description": "Goes up when the medicine regimen changes after approval. Doses from older versions cannot be dispensed."},
-    {"fieldname": "regimen_signature", "fieldtype": "Data", "label": "Regimen Signature", "read_only": 1, "hidden": 1}
+    {"fieldname": "regimen_signature", "fieldtype": "Data", "label": "Regimen Signature", "read_only": 1, "hidden": 1},
+    {"fieldname": "reminder_sent", "fieldtype": "Check", "label": "Reminder Sent", "read_only": 1, "default": "0"}
   ],
   "permissions": []
 }

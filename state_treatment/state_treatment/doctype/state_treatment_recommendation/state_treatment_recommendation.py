@@ -26,6 +26,7 @@ class StateTreatmentRecommendation(Document):
 
     def validate(self):
         self.fill_patient_fields()
+        self.keep_reminder_flags()
         self.validate_required_before_review()
         self.calculate_total()
         self.validate_treatment_doses()
@@ -47,6 +48,18 @@ class StateTreatmentRecommendation(Document):
         for form_field, value in values.items():
             if patient_changed or not self.get(form_field):
                 self.set(form_field, value)
+
+    def keep_reminder_flags(self):
+        """A form saved from an old copy must not clear a reminder already sent."""
+        previous_doc = self.get_doc_before_save()
+        if not previous_doc:
+            return
+        for fieldname in ("treatment_doses", "appointments"):
+            previous = {row.name: row for row in previous_doc.get(fieldname) or []}
+            for row in self.get(fieldname) or []:
+                old = previous.get(row.name)
+                if old and cint(old.get("reminder_sent")):
+                    row.reminder_sent = 1
 
     def validate_required_before_review(self):
         """Block leaving Draft until the identity fields and protocol items are filled.

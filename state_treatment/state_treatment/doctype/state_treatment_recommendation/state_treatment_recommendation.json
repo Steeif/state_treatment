@@ -54,6 +54,8 @@
     {"fieldname": "treatment_tracking_tab", "fieldtype": "Tab Break", "label": "Treatment Tracking"},
     {"fieldname": "summary_section", "fieldtype": "Section Break", "label": "Summary"},
     {"fieldname": "dose_summary", "fieldtype": "Small Text", "label": "Treatment Summary", "read_only": 1, "description": "Summary of dispensed doses and performed procedures. Filled automatically once the request is approved for disbursement."},
+    {"fieldname": "appointments_section", "fieldtype": "Section Break", "label": "Appointments"},
+    {"fieldname": "appointments", "fieldtype": "Table", "label": "Appointments", "options": "Treatment Appointment", "description": "Important appointments such as procedures and follow-up visits. Reminders are sent before each appointment date."},
     {"fieldname": "dose_section", "fieldtype": "Section Break", "label": "Dose Schedule"},
     {"fieldname": "treatment_doses", "fieldtype": "Table", "label": "Treatment Dose Schedule", "options": "Treatment Dose Tracking Item", "description": "Doses created automatically from the medicine rows in Protocol Items. Treatment Pharmacists tick each dose here when it is dispensed."}
   ],
