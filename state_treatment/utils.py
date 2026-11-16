@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 from frappe.utils import flt, nowdate
 
 from state_treatment.settings import get_state_price_list
@@ -35,7 +36,7 @@ def get_protocol_item_price(item_code):
 def get_protocol_item_details(item_code):
     """Called from the client when a protocol item is picked in the child table."""
     if not frappe.get_meta("Item").has_field("official_protocol_code"):
-        frappe.throw("Import the authorized protocol catalog before adding treatment items.")
+        frappe.throw(_("Import the authorized protocol catalog before adding treatment items."))
 
     item = frappe.db.get_value(
         "Item",
@@ -48,7 +49,7 @@ def get_protocol_item_details(item_code):
         as_dict=True,
     ) or {}
     if not item.get("official_protocol_code"):
-        frappe.throw("Selected item is not part of the treatment protocol catalog.")
+        frappe.throw(_("Selected item is not part of the treatment protocol catalog."))
 
     return {
         "item_name": item.get("item_name"),
