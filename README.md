@@ -100,6 +100,8 @@ bench build --app state_treatment
 
 On an existing site, this adds the default Patient Field Map rows once: National ID if the map is empty, and Date of Birth if no row fills it yet. It does not change any row an administrator has already set.
 
+Every migrate reloads the State Treatment workspace from the app, so its shortcuts and reports always match the installed version.
+
 Version 0.5.0 removes the approval workflow. Requests that were in **Under Committee Review** or **Recommendation Approved** go back to **Draft**, and the General Manager approves them again with **Approve for Disbursement**. The migration also deletes the Workflow from the site.
 
 Version 0.3.0 changes how a treatment is completed. The status is no longer set automatically when the last dose is dispensed. The General Manager uses **Close Treatment** instead.

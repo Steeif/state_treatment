@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="state_treatment",
-    version="0.6.2",
+    version="0.6.3",
     description="State Treatment Frappe app",
     author="State Treatment",
     packages=find_packages(),

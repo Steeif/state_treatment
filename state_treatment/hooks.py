@@ -14,6 +14,7 @@ after_migrate = [
     "state_treatment.patient_link.backfill_patient_summaries",
     "state_treatment.print_formats.ensure_print_formats",
     "state_treatment.reports.ensure_reports",
+    "state_treatment.workspace_sync.refresh_workspace",
 ]
 
 scheduler_events = {
