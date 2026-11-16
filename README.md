@@ -42,7 +42,7 @@ flowchart TD
 
 ### Procedures and Medicine Doses
 
-For each medicine protocol item, set its **First Dose Date** on that request row. Medicine name, number of doses and interval come from the protocol catalog. When the request reaches **Approved for Disbursement**, the app creates one dose row per prescribed dose, with dates calculated from the first dose date and the protocol interval. The medical team can adjust scheduled dates. A change to a medicine's regimen or start date after approval creates a new numbered schedule version. Earlier doses and dispensing records remain.
+For each medicine protocol item, set its **First Dose Date** on that request row. Medicine name, number of doses and interval come from the protocol catalog. When the request reaches **Approved for Disbursement**, the app creates one dose row per prescribed dose, with dates calculated from the first dose date and the protocol interval. The medical team can adjust a scheduled date. The undispensed doses after it are then spread evenly over the rest of the treatment period, which starts on the first dose date and lasts for the medicine's Treatment Duration. Dispensed doses cannot be moved. A change to a medicine's regimen or start date after approval creates a new numbered schedule version. Earlier doses and dispensing records remain.
 
 Schedules are linked to the individual request-item row, so duplicate medicines stay distinct. Re-saving an unchanged approved request does not duplicate its schedule.
 

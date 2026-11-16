@@ -20,6 +20,21 @@ REQUIRED_BEFORE_REVIEW = ("national_id", "recommendation_no", "recommendation_ye
 ROLES_WITH_REQUEST_ACCESS = {"System Manager", "General Manager", "Admin Reviewer", "Medical Reviewer", "Treatment Pharmacist"}
 
 
+def _spaced_dates(start, stop, count, inclusive):
+    """Return `count` dates spread evenly after `start`.
+
+    inclusive: the last date is `stop`. Otherwise every date falls strictly
+    between `start` and `stop`. Returns None when the days do not fit, which
+    is when the spacing would be under one day.
+    """
+    span = (stop - start).days
+    slots = count if inclusive else count + 1
+    if slots <= 0 or span < slots:
+        return None
+    step = span / slots
+    return [start + timedelta(days=int(k * step + 0.5)) for k in range(1, count + 1)]
+
+
 class StateTreatmentRecommendation(Document):
     def autoname(self):
         self.name = make_autoname(
@@ -35,6 +50,7 @@ class StateTreatmentRecommendation(Document):
         self.validate_treatment_doses()
         self.validate_procedure_done()
         self.sync_dose_schedule()
+        self.redistribute_moved_doses()
         self.update_dose_summary()
 
     def fill_patient_fields(self):
@@ -154,6 +170,90 @@ class StateTreatmentRecommendation(Document):
             else:
                 row.dispensed_by = previous_row.dispensed_by
                 row.dispensed_on = previous_row.dispensed_on
+
+    def redistribute_moved_doses(self):
+        """Spread the undispensed doses after a moved dose over the rest of the treatment period.
+
+        A dose whose date was changed keeps its new date. The undispensed doses of
+        the same medicine that follow it are spaced evenly over the remaining days,
+        up to the next moved or dispensed dose, or to the end of the treatment
+        period. The period starts at the medicine's first dose date and lasts for
+        its Treatment Duration. Dispensed doses cannot be moved.
+        """
+        if self._is_pharmacist_only():
+            return
+        previous_doc = self.get_doc_before_save()
+        if not previous_doc:
+            return
+        previous = {row.name: row for row in previous_doc.treatment_doses}
+
+        moved_by_item = {}
+        for position, dose in enumerate(self.treatment_doses):
+            old = previous.get(dose.name)
+            if not old or not dose.get("protocol_item"):
+                continue
+            if getdate(dose.scheduled_date) == getdate(old.scheduled_date):
+                continue
+            if cint(dose.dispensed):
+                frappe.throw(_("A dispensed dose cannot be moved: {0}").format(dose.dose))
+            if cint(dose.schedule_version) != cint(old.schedule_version):
+                continue  # the regimen changed in this save, so the schedule was rebuilt
+            moved_by_item.setdefault(dose.protocol_item, []).append(position)
+
+        for protocol_item, moved in moved_by_item.items():
+            self._spread_after_moved(protocol_item, moved)
+
+    def _spread_after_moved(self, protocol_item, moved):
+        doses = self.treatment_doses
+        version = max(cint(d.schedule_version) for d in doses if d.protocol_item == protocol_item)
+        rows = [
+            p for p, d in enumerate(doses)
+            if d.protocol_item == protocol_item and cint(d.schedule_version) == version
+        ]
+        protocol_row = next((r for r in self.protocol_items if r.name == protocol_item), None)
+        medicine = (protocol_row.medicine_name or protocol_row.item) if protocol_row else protocol_item
+        period_end = self._treatment_end(protocol_row)
+        if period_end is None:
+            # No Treatment Duration on the item: keep the schedule's current last date.
+            period_end = max(getdate(doses[p].scheduled_date) for p in rows)
+
+        markers = sorted(p for p in rows if p in moved or cint(doses[p].dispensed))
+        changed = False
+        for anchor in moved:
+            following = next((p for p in markers if p > anchor), None)
+            between = [
+                p for p in rows
+                if p > anchor and (following is None or p < following) and not cint(doses[p].dispensed)
+            ]
+            if not between:
+                continue
+            start = getdate(doses[anchor].scheduled_date)
+            if following is not None:
+                dates = _spaced_dates(start, getdate(doses[following].scheduled_date), len(between), inclusive=False)
+            else:
+                dates = _spaced_dates(start, period_end, len(between), inclusive=True)
+            if dates is None:
+                frappe.throw(
+                    _("There are not enough days left in the treatment period for the remaining doses of {0}.").format(medicine)
+                )
+            for position, date in zip(between, dates):
+                doses[position].scheduled_date = date
+            changed = True
+
+        if changed:
+            frappe.msgprint(
+                _("The remaining doses of {0} were spread over the rest of the treatment period.").format(medicine),
+                indicator="blue",
+            )
+
+    def _treatment_end(self, protocol_row):
+        """Last day of the treatment period, or None when it is not known."""
+        if not protocol_row or not protocol_row.first_dose_date or not protocol_row.item:
+            return None
+        duration = cint(frappe.db.get_value("Item", protocol_row.item, "duration_days"))
+        if duration <= 0:
+            return None
+        return getdate(protocol_row.first_dose_date) + timedelta(days=duration - 1)
 
     def sync_dose_schedule(self):
         """Build the dose schedule from the medicine rows in Protocol Items.
