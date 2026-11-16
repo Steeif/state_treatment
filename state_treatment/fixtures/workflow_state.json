@@ -3,25 +3,25 @@
     "doctype": "Workflow State",
     "name": "Draft",
     "workflow_state_name": "Draft",
-    "style": ""
+    "style": "Inverse"
   },
   {
     "doctype": "Workflow State",
     "name": "Under Committee Review",
     "workflow_state_name": "Under Committee Review",
-    "style": ""
+    "style": "Warning"
   },
   {
     "doctype": "Workflow State",
     "name": "Recommendation Approved",
     "workflow_state_name": "Recommendation Approved",
-    "style": "Success"
+    "style": "Info"
   },
   {
     "doctype": "Workflow State",
     "name": "Approved for Disbursement",
     "workflow_state_name": "Approved for Disbursement",
-    "style": "Success"
+    "style": "Primary"
   },
   {
     "doctype": "Workflow State",
