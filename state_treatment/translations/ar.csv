@@ -222,4 +222,3 @@
 "Fieldname on Patient that holds the value, for example the card number field.","اسم الحقل في سجل المريض الذي يحتوي على القيمة، على سبيل المثال حقل رقم البطاقة.",
 "Price list (EGP) that holds the protocol prices. Created automatically if it does not exist.","قائمة الأسعار (جنيه مصري) التي تحتوي على أسعار البروتوكولات. تُنشأ تلقائيًا إذا لم تكن موجودة.",
 "Copies values from the Patient record into request fields. Set the Form Field and the Patient Field for each row.","تنسخ القيم من سجل المريض إلى حقول الطلب. حدد حقل النموذج وحقل المريض لكل صف.",
-"Guide for users","دليل المستخدم",
