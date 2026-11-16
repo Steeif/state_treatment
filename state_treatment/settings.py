@@ -72,9 +72,29 @@ def seed_default_patient_map():
     doc.save(ignore_permissions=True)
 
 
+DOB_FORM_FIELD = "patient_dob"
+DOB_PATIENT_FIELD = "dob"  # Healthcare's standard Date of Birth field
+
+
+def add_default_dob_mapping():
+    """Add the Date of Birth row to the Patient Field Map if no row fills patient_dob yet.
+
+    Runs on install and once on existing sites through a patch. It never
+    changes a row an administrator has already set.
+    """
+    doc = frappe.get_single(SETTINGS)
+    if any(row.form_field == DOB_FORM_FIELD for row in doc.get(MAP_FIELD) or []):
+        return
+    doc.append(MAP_FIELD, {"form_field": DOB_FORM_FIELD, "patient_field": DOB_PATIENT_FIELD})
+    doc.state_price_list = doc.state_price_list or DEFAULT_PRICE_LIST
+    ensure_price_list(doc.state_price_list)
+    doc.save(ignore_permissions=True)
+
+
 def after_install():
     ensure_settings()
     seed_default_patient_map()
+    add_default_dob_mapping()
     # install-app does not run the after_migrate hooks, so create the same fields here.
     from state_treatment.item_protocol import ensure_item_protocol_fields
     from state_treatment.patient_link import ensure_patient_fields

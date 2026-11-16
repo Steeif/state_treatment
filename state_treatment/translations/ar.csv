@@ -201,3 +201,5 @@
 "Shown in the reminder, for example what to bring.","يظهر في التذكير، مثل المستندات المطلوب إحضارها.",
 "Receives the reminder by email.","يستلم التذكير بالبريد الإلكتروني.",
 "Tick after the file is reviewed at the hospital. Required before approval for disbursement.","علّم الخانة بعد مراجعة الملف في المستشفى. مطلوبة قبل الاعتماد للصرف.",
+"Date of Birth","تاريخ الميلاد",
+"The patient's date of birth, copied from the Patient record through the Patient Field Map in State Treatment Settings.","تاريخ ميلاد المريض، ويُنسخ تلقائيًا من سجل المريض عبر خريطة حقول المريض في إعدادات علاج على نفقة الدولة.",

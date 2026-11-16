@@ -96,7 +96,7 @@ bench build --app state_treatment
 bench restart
 ```
 
-Installation adds the default Patient Field Map row (National ID) to State Treatment Settings.
+Installation adds the default Patient Field Map rows (National ID and Date of Birth) to State Treatment Settings.
 
 ### Upgrade
 
@@ -105,7 +105,7 @@ bench --site [site-name] migrate
 bench build --app state_treatment
 ```
 
-On an existing site, this adds the default Patient Field Map row once, if the map is empty. It does not change any row an administrator has already set.
+On an existing site, this adds the default Patient Field Map rows once: National ID if the map is empty, and Date of Birth if no row fills it yet. It does not change any row an administrator has already set.
 
 Version 0.3.0 changes how a treatment is completed. The status is no longer set automatically when the last dose is dispensed. The General Manager uses **Close Treatment** instead.
 
@@ -128,7 +128,7 @@ Open **State Treatment Settings**. Only the System Manager role can change it.
   - **Form Field:** the request field to fill, for example `national_id`.
   - **Patient Field:** the Patient fieldname that holds the value, for example the custom card-number field `رقم_البطاقة`.
 
-The default row fills `national_id` from `رقم_البطاقة`. Values are copied when a patient is picked. They are also copied on save into any mapped field that is empty, and into every mapped field when the patient changes. Pharmacist saves never copy Patient values.
+The default rows fill `national_id` from `رقم_البطاقة` and `patient_dob` from `dob`. Values are copied when a patient is picked. They are also copied on save into any mapped field that is empty, and into every mapped field when the patient changes. Pharmacist saves never copy Patient values.
 
 Rules for the map:
 
