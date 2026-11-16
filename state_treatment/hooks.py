@@ -13,6 +13,7 @@ after_migrate = [
     "state_treatment.patient_link.ensure_patient_fields",
     "state_treatment.patient_link.backfill_patient_summaries",
     "state_treatment.print_formats.ensure_print_formats",
+    "state_treatment.reports.ensure_reports",
 ]
 
 scheduler_events = {

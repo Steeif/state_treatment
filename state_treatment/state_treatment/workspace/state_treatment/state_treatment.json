@@ -46,13 +46,37 @@
       "label": "State Treatment Settings",
       "type": "DocType",
       "link_to": "State Treatment Settings"
+    },
+    {
+      "label": "الطلبات حسب الحالة",
+      "type": "Report",
+      "link_to": "الطلبات حسب الحالة"
+    },
+    {
+      "label": "المبالغ حسب الحالة",
+      "type": "Report",
+      "link_to": "المبالغ حسب الحالة"
+    },
+    {
+      "label": "الجرعات المستحقة",
+      "type": "Report",
+      "link_to": "الجرعات المستحقة"
+    },
+    {
+      "label": "الإجراءات المعلقة",
+      "type": "Report",
+      "link_to": "الإجراءات المعلقة"
+    },
+    {
+      "label": "المواعيد القادمة",
+      "type": "Report",
+      "link_to": "المواعيد القادمة"
     }
   ],
-  "content": "[{\"id\":\"st_quick_access\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Quick Access</b></span>\",\"col\":12}},{\"id\":\"st_new_request\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Treatment Request\",\"col\":3}},{\"id\":\"st_requests\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Treatment Requests\",\"col\":3}},{\"id\":\"st_letters\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Administrative Letters\",\"col\":3}},{\"id\":\"st_protocol_items\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Treatment Protocol Items\",\"col\":3}},{\"id\":\"st_settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"State Treatment Settings\",\"col\":3}}]",
+  "content": "[{\"id\":\"st_quick_access\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Quick Access</b></span>\",\"col\":12}},{\"id\":\"st_new_request\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"New Treatment Request\",\"col\":3}},{\"id\":\"st_requests\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Treatment Requests\",\"col\":3}},{\"id\":\"st_letters\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Administrative Letters\",\"col\":3}},{\"id\":\"st_protocol_items\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Treatment Protocol Items\",\"col\":3}},{\"id\":\"st_settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"State Treatment Settings\",\"col\":3}},{\"id\":\"st_reports_header\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>التقارير</b></span>\",\"col\":12}},{\"id\":\"st_rep_1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"الطلبات حسب الحالة\",\"col\":3}},{\"id\":\"st_rep_2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"المبالغ حسب الحالة\",\"col\":3}},{\"id\":\"st_rep_3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"الجرعات المستحقة\",\"col\":3}},{\"id\":\"st_rep_4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"الإجراءات المعلقة\",\"col\":3}},{\"id\":\"st_rep_5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"المواعيد القادمة\",\"col\":3}}]",
   "links": [],
   "charts": [],
   "number_cards": [],
   "quick_lists": [],
   "custom_blocks": []
 }
-

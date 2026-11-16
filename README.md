@@ -161,3 +161,15 @@ A daily job reminds the patient, and the users listed in **State Treatment Setti
 - A printable request form. Print formats stay in Arabic. Confirm its layout matches the official form on the target site before production use.
 - A Sales Invoice check that requires an approved-for-disbursement request and limits invoice items to those on that request.
 - Arabic labels, messages and workflow names from `translations/ar.csv`. Field names stay in English.
+
+## Reports
+
+Five query reports are created on migrate from `state_treatment/report_sql/`. They appear in the State Treatment workspace under Reports:
+
+- Requests by status (الطلبات حسب الحالة)
+- Amounts by status (المبالغ حسب الحالة)
+- Due doses, not yet dispensed (الجرعات المستحقة)
+- Pending procedures (الإجراءات المعلقة)
+- Upcoming appointments (المواعيد القادمة)
+
+Edit the `.sql` files and run `bench --site <site> migrate` to update them.
