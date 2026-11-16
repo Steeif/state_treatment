@@ -5,3 +5,4 @@
 state_treatment.patches.v0_2.seed_patient_field_map
 state_treatment.patches.v0_3.merge_removed_states
 state_treatment.patches.v0_4.add_patient_dob_mapping
+state_treatment.patches.v0_5.remove_workflow

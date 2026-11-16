@@ -27,7 +27,7 @@
     {"fieldname": "recommendation_no", "fieldtype": "Data", "label": "Recommendation No.", "description": "The official number of this recommendation. Required before the request leaves Draft."},
     {"fieldname": "recommendation_year", "fieldtype": "Date", "label": "Recommendation Date", "description": "The official date of this recommendation. Required before the request leaves Draft."},
     {"fieldname": "col_request", "fieldtype": "Column Break"},
-    {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Draft\nUnder Committee Review\nRecommendation Approved\nApproved for Disbursement\nRejected\nTreatment Completed", "default": "Draft", "read_only": 1, "in_standard_filter": 1, "in_list_view": 1, "description": "Current stage in the approval workflow. Moves forward only through the workflow buttons."},
+    {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Draft\nApproved for Disbursement\nRejected\nTreatment Completed", "default": "Draft", "read_only": 1, "in_standard_filter": 1, "in_list_view": 1, "description": "Changed only by the buttons on this form: Approve for Disbursement or Reject while in Draft, and Close Treatment once the treatment is finished."},
     {"fieldname": "hospital_file_reviewed", "fieldtype": "Check", "label": "File Reviewed at Hospital", "default": "0", "description": "Tick after the file is reviewed at the hospital. Required before approval for disbursement."},
     {"fieldname": "codes_section", "fieldtype": "Section Break", "label": "Codes", "collapsible": 1},
     {"fieldname": "entry_code", "fieldtype": "Data", "label": "Entry Code"},
@@ -66,7 +66,8 @@
     {"role": "Admin Reviewer", "read": 1, "write": 1, "create": 1, "print": 1},
     {"role": "Medical Reviewer", "read": 1, "write": 1, "print": 1},
     {"role": "General Manager", "read": 1, "write": 1, "print": 1},
-    {"role": "Treatment Pharmacist", "read": 1, "write": 1, "print": 1}
+    {"role": "Treatment Pharmacist", "read": 1, "write": 1, "print": 1},
+    {"role": "Treatment Accountant", "read": 1, "write": 1, "create": 1, "print": 1}
   ],
   "sort_field": "modified",
   "sort_order": "DESC"

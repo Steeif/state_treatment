@@ -102,12 +102,18 @@ function add_treatment_buttons(frm) {
     if (frm.is_new()) {
         return;
     }
-    if (!["Approved for Disbursement", "Treatment Completed"].includes(frm.doc.status)) {
-        return;
-    }
 
     const roles = frappe.user_roles || [];
     const is_system_manager = roles.includes("System Manager");
+
+    if (frm.doc.status === "Draft" && (roles.includes("General Manager") || is_system_manager)) {
+        frm.add_custom_button(__("Approve for Disbursement"), () => approve_request(frm)).addClass("btn-primary");
+        frm.add_custom_button(__("Reject"), () => reject_request(frm));
+    }
+
+    if (!["Approved for Disbursement", "Treatment Completed"].includes(frm.doc.status)) {
+        return;
+    }
 
     if (roles.includes("Medical Reviewer") || is_system_manager) {
         const pending = (frm.doc.protocol_items || []).filter(
@@ -270,5 +276,37 @@ function close_treatment(frm) {
                 frm.reload_doc();
             },
         });
+    });
+}
+
+function approve_request(frm) {
+    if (frm.is_dirty()) {
+        frappe.msgprint(__("Save the form before continuing."));
+        return;
+    }
+    frappe.confirm(__("Approve this request for disbursement? Dispensing starts after approval."), () => {
+        run_status_action(frm, "state_treatment.actions.approve_for_disbursement", __("Request approved for disbursement."));
+    });
+}
+
+function reject_request(frm) {
+    if (frm.is_dirty()) {
+        frappe.msgprint(__("Save the form before continuing."));
+        return;
+    }
+    frappe.confirm(__("Reject this request? A rejected request cannot be approved later."), () => {
+        run_status_action(frm, "state_treatment.actions.reject_recommendation", __("Request rejected."));
+    });
+}
+
+function run_status_action(frm, method, success_message) {
+    frappe.call({
+        method: method,
+        args: { recommendation: frm.doc.name },
+        freeze: true,
+        callback() {
+            frappe.show_alert({ message: success_message, indicator: "green" });
+            frm.reload_doc();
+        },
     });
 }

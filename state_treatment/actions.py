@@ -1,16 +1,13 @@
-"""Form buttons for an approved State Treatment Recommendation.
+"""Buttons on the State Treatment Recommendation form.
 
-A Medical Reviewer marks a procedure as done, and a Treatment Pharmacist
-dispenses a dose. Both run on the server and check the role here. They save
-with ignore_permissions because the workflow allows editing an approved
-request only for the General Manager, which would otherwise block them.
-The normal validate() chain still runs on every save.
+Each action checks the role here, then saves through the normal save, so
+validate() and the document permissions run on every change. Status changes
+happen only in these actions.
 """
 
 import frappe
 from frappe import _
 from frappe.utils import cint
-from frappe.model.workflow import apply_workflow
 
 from state_treatment.state_treatment.doctype.state_treatment_recommendation.state_treatment_recommendation import (
     APPROVED_STATUS,
@@ -18,10 +15,32 @@ from state_treatment.state_treatment.doctype.state_treatment_recommendation.stat
 )
 
 DOCTYPE = "State Treatment Recommendation"
+DRAFT_STATUS = "Draft"
+REJECTED_STATUS = "Rejected"
+APPROVE_ROLES = ("General Manager", "System Manager")
 PROCEDURE_ROLES = ("Medical Reviewer", "System Manager")
 PHARMACIST_ROLES = ("Treatment Pharmacist", "System Manager")
 CLOSE_ROLES = ("General Manager", "System Manager")
-CLOSE_ACTION = "Close Treatment"
+
+
+@frappe.whitelist()
+def approve_for_disbursement(recommendation):
+    _require_role(APPROVE_ROLES, _("Only the General Manager can approve a request for disbursement."))
+    doc = _load_draft(recommendation)
+    if not cint(doc.hospital_file_reviewed):
+        frappe.throw(_("Tick File Reviewed at Hospital before approving for disbursement."))
+    doc.status = APPROVED_STATUS
+    doc.save()
+    return {"status": doc.status}
+
+
+@frappe.whitelist()
+def reject_recommendation(recommendation):
+    _require_role(APPROVE_ROLES, _("Only the General Manager can reject a request."))
+    doc = _load_draft(recommendation)
+    doc.status = REJECTED_STATUS
+    doc.save()
+    return {"status": doc.status}
 
 
 @frappe.whitelist()
@@ -35,7 +54,7 @@ def mark_procedure_done(recommendation, row_name):
         frappe.throw(_("Procedure {0} is already done.").format(row.item_name or row.item))
 
     row.procedure_done = 1
-    doc.save(ignore_permissions=True)
+    doc.save()
     return {"status": doc.status}
 
 
@@ -52,13 +71,35 @@ def mark_dose_dispensed(recommendation, row_name):
         )
 
     dose.dispensed = 1
-    doc.save(ignore_permissions=True)
+    doc.save()
+    return {"status": doc.status}
+
+
+@frappe.whitelist()
+def close_treatment(recommendation):
+    _require_role(CLOSE_ROLES, _("Only the General Manager can close a treatment."))
+    doc = frappe.get_doc(DOCTYPE, recommendation)
+    doc.check_permission("write")
+    if doc.status != APPROVED_STATUS:
+        frappe.throw(_("Only an approved request can be closed."))
+    if not doc.is_treatment_finished():
+        frappe.throw(_("Every procedure must be done and every dose dispensed before the treatment can be closed."))
+    doc.status = COMPLETED_STATUS
+    doc.save()
     return {"status": doc.status}
 
 
 def _require_role(roles, message):
     if not set(roles) & set(frappe.get_roles()):
         frappe.throw(message)
+
+
+def _load_draft(recommendation):
+    doc = frappe.get_doc(DOCTYPE, recommendation)
+    doc.check_permission("write")
+    if doc.status != DRAFT_STATUS:
+        frappe.throw(_("Only a draft request can be approved or rejected."))
+    return doc
 
 
 def _load_approved(recommendation):
@@ -83,15 +124,3 @@ def _latest_version(doses, protocol_item):
         (cint(dose.schedule_version) for dose in doses if dose.protocol_item == protocol_item),
         default=0,
     )
-
-
-@frappe.whitelist()
-def close_treatment(recommendation):
-    """Move an approved request to Treatment Completed through its workflow transition."""
-    _require_role(CLOSE_ROLES, _("Only the General Manager can close a treatment."))
-    doc = frappe.get_doc(DOCTYPE, recommendation)
-    doc.check_permission("read")
-    if not doc.is_treatment_finished():
-        frappe.throw(_("Every procedure must be done and every dose dispensed before the treatment can be closed."))
-    apply_workflow(doc, CLOSE_ACTION)
-    return {"status": doc.status}

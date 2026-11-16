@@ -6,46 +6,39 @@ State Treatment helps a healthcare team manage requests for state-funded treatme
 
 ## Who Does What
 
-- **Administrative Reviewer:** Creates the request for an existing patient. The patient details configured in Settings fill in automatically. Records administrative letters when more information is needed.
-- **Medical Reviewer:** Reviews requests at the committee stage and resumes review after requested information is recorded. On an approved request, marks each procedure as done.
-- **General Manager:** Makes the recommendation decision and moves approved requests through hospital-file review and disbursement approval. Closes the treatment with **Close Treatment** once every procedure is done and every dose is dispensed.
+- **Treatment Accountant:** Registers requests for existing patients and calculates their cost. Can edit draft requests only, and can read the totals and the reports.
+- **Admin Reviewer:** Creates the request for an existing patient. The patient details configured in Settings fill in automatically. Records administrative letters linked to a request.
+- **Medical Reviewer:** On an approved request, marks each procedure as done.
+- **General Manager:** Approves a draft request for disbursement once the hospital file is reviewed, or rejects it. Closes the treatment with **Close Treatment** once every procedure is done and every dose is dispensed.
 - **Treatment Pharmacist:** On an approved request, dispenses scheduled medicine doses. The system records the user and time.
 
-In this release, hospital-file review is a step completed by the General Manager; there is no separate Hospital role. **Treatment Completed** is set only by the General Manager's **Close Treatment** action, and only once the treatment is fully done.
+The **File Reviewed at Hospital** box must be ticked before the General Manager can approve a request for disbursement. **Treatment Completed** is set only by the General Manager's **Close Treatment** action, and only once the treatment is fully done.
 
 ## Using the System
 
-Before you begin, make sure the patient already exists in Healthcare, the administrator has loaded the treatment catalog and prices, and the **Patient Field Map** in State Treatment Settings points to Patient fields that exist on the site. Sign in with the role assigned to you. You will work with a **State Treatment Recommendation** record, which follows the approval workflow below.
+Before you begin, make sure the patient already exists in Healthcare, the administrator has loaded the treatment catalog and prices, and the **Patient Field Map** in State Treatment Settings points to Patient fields that exist on the site. Sign in with the role assigned to you. You will work with a **State Treatment Recommendation** record. Its status changes only through the buttons on the form, described below.
 
 Before a request leaves Draft, fill in the **National ID**, **Recommendation No.**, **Recommendation Date**, and at least one **Protocol Item** with its item. Before final approval, every medicine row also needs a **First Dose Date**. An **Administrative Letter** needs its recommendation, letter text, and issue date.
 
-### Workflow Graph
+### Status and Buttons
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B["1. Admin Reviewer<br/>Open State Treatment Recommendation<br/>Choose New"]
-    B --> C["Choose the patient<br/>Mapped Patient details fill in<br/>Add treatment items<br/>Save the request"]
-    C --> D["Saved as Draft"]
-    D --> E["2. Medical Reviewer<br/>Choose Submit for Committee Review"]
-    E --> F["Request is in committee review"]
-    F --> Q{"Need more information?"}
-    Q -->|Yes| G["3. Admin Reviewer<br/>Choose Request Administrative Letter<br/>Create and link the letter"]
-    G --> H["Medical Reviewer<br/>Choose Resume Review"]
-    H --> F
-    Q -->|No| I["4. General Manager<br/>Choose Approve Recommendation"]
-    I --> J["Hospital file is checked"]
-    J --> K["5. General Manager<br/>Choose Review File at Hospital"]
-    K --> L["General Manager<br/>Choose Approve for Disbursement"]
-    L --> M["6. Sales Invoice<br/>Link the request<br/>Use only items on that request"]
-    M --> N["Submit the invoice<br/>Only after disbursement approval"]
-    L --> T["7. Treatment Actions on the approved request<br/>Medical Reviewer: Mark Procedure Done<br/>Treatment Pharmacist: Dispense Dose"]
-    T --> R{"Every procedure done and every dose dispensed?"}
-    R -->|No| T
-    R -->|Yes| S["General Manager<br/>Choose Close Treatment"]
-    S --> Z["Status: Treatment Completed"]
+    A["Treatment Accountant or Admin Reviewer<br/>Create the request<br/>Save as Draft"] --> B["General Manager<br/>Tick File Reviewed at Hospital"]
+    B --> C["Approve for Disbursement<br/>Status: Approved for Disbursement"]
+    B --> R["Reject<br/>Status: Rejected"]
+    C --> D["Medical Reviewer<br/>Mark Procedure Done"]
+    C --> E["Treatment Pharmacist<br/>Dispense Dose"]
+    D --> F{"Every procedure done and every dose dispensed?"}
+    E --> F
+    F -->|Yes| G["General Manager<br/>Close Treatment"]
+    F -->|No| D
+    G --> H["Status: Treatment Completed"]
 ```
 
-The graph shows the approval steps. Treatment on an approved request uses the **Treatment Actions** menu described below.
+- **Approve for Disbursement** (General Manager, from Draft): needs the hospital file box ticked. It saves the request, creates the dose schedule, and enables treatment actions.
+- **Reject** (General Manager, from Draft): the request cannot be approved later.
+- Treatment Accountants edit a request only while it is in Draft.
 
 ### Procedures and Medicine Doses
 
@@ -82,7 +75,7 @@ Before staff begin processing requests, make sure that:
 - Healthcare is installed and contains the patients who will be selected on requests. The **Patient** record is required for each request.
 - The relevant **Healthcare Service Unit** records exist for facilities selected on requests and administrative letters.
 - Protocol Items and their State-funded EGP prices have been entered manually, or an authorized catalog has been provisioned securely. Restricted protocol data must not be committed to the public repository.
-- Staff have user accounts and have been assigned the appropriate **Admin Reviewer**, **Medical Reviewer**, **General Manager**, or **Treatment Pharmacist** role. A System Manager can administer setup.
+- Staff have user accounts and have been assigned the appropriate **Admin Reviewer**, **Medical Reviewer**, **General Manager**, **Treatment Pharmacist**, or **Treatment Accountant** role. Treatment Accountants and Treatment Pharmacists also need read access to **Patient** and **Item**, because they pick the patient and the protocol items. The app does not grant this; set it in Role Permission Manager. A System Manager can administer setup.
 - The ERPNext site is configured for the organization, including the company and any standard customer, accounting, and tax details needed to create its Sales Invoices.
 
 The State-funded selling price list must use EGP and each protocol Item must have a price in that list. Protocol Items can be entered manually from Item; no catalog data file is required for manual entry.
@@ -106,6 +99,8 @@ bench build --app state_treatment
 ```
 
 On an existing site, this adds the default Patient Field Map rows once: National ID if the map is empty, and Date of Birth if no row fills it yet. It does not change any row an administrator has already set.
+
+Version 0.5.0 removes the approval workflow. Requests that were in **Under Committee Review** or **Recommendation Approved** go back to **Draft**, and the General Manager approves them again with **Approve for Disbursement**. The migration also deletes the Workflow from the site.
 
 Version 0.3.0 changes how a treatment is completed. The status is no longer set automatically when the last dose is dispensed. The General Manager uses **Close Treatment** instead.
 
@@ -153,14 +148,14 @@ A daily job reminds the patient, and the users listed in **State Treatment Setti
 
 ## What the App Includes
 
-- A request record with a tracked approval workflow, and a **Treatment Completed** status set by the General Manager's Close Treatment action.
+- A request record with Approve for Disbursement, Reject and Close Treatment buttons. Its status changes only through these buttons.
 - State Treatment Settings for the State-funded Price List and the Patient Field Map.
 - Versioned medicine dose schedules, created at final approval and linked to their exact request-item row.
 - Dispensing and procedure-completion records with user and timestamp, and a Treatment Summary.
 - Administrative letters linked to requests.
 - A printable request form. Print formats stay in Arabic. Confirm its layout matches the official form on the target site before production use.
 - A Sales Invoice check that requires an approved-for-disbursement request and limits invoice items to those on that request.
-- Arabic labels, messages and workflow names from `translations/ar.csv`. Field names stay in English.
+- Arabic labels and messages from `translations/ar.csv`. Field names stay in English.
 
 ## Reports
 

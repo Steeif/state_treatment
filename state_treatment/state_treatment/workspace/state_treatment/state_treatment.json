@@ -15,7 +15,9 @@
     { "role": "Admin Reviewer" },
     { "role": "Medical Reviewer" },
     { "role": "General Manager" },
-    { "role": "System Manager" }
+    { "role": "System Manager" },
+    { "role": "Treatment Pharmacist" },
+    { "role": "Treatment Accountant" }
   ],
   "shortcuts": [
     {

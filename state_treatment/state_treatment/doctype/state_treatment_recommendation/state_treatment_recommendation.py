@@ -16,6 +16,8 @@ APPROVED_STATUS = "Approved for Disbursement"
 COMPLETED_STATUS = "Treatment Completed"
 # Filled in before a request leaves Draft, so the committee never reviews an incomplete file.
 REQUIRED_BEFORE_REVIEW = ("national_id", "recommendation_no", "recommendation_year", "protocol_items")
+# A user with any of these roles is not limited to the accountant's draft-only access.
+ROLES_WITH_REQUEST_ACCESS = {"System Manager", "General Manager", "Admin Reviewer", "Medical Reviewer", "Treatment Pharmacist"}
 
 
 class StateTreatmentRecommendation(Document):
@@ -27,6 +29,7 @@ class StateTreatmentRecommendation(Document):
     def validate(self):
         self.fill_patient_fields()
         self.keep_reminder_flags()
+        self.validate_accountant_draft_only()
         self.validate_required_before_review()
         self.calculate_total()
         self.validate_treatment_doses()
@@ -60,6 +63,15 @@ class StateTreatmentRecommendation(Document):
                 old = previous.get(row.name)
                 if old and cint(old.get("reminder_sent")):
                     row.reminder_sent = 1
+
+    def validate_accountant_draft_only(self):
+        """Treatment Accountants register requests and read costs. They edit drafts only."""
+        if not self._is_accountant_only():
+            return
+        previous_doc = self.get_doc_before_save()
+        previous_status = previous_doc.status if previous_doc else "Draft"
+        if previous_status != "Draft" or (self.status or "Draft") != "Draft":
+            frappe.throw(_("Treatment Accountants can only edit draft requests."))
 
     def validate_required_before_review(self):
         """Block leaving Draft until the identity fields and protocol items are filled.
@@ -259,6 +271,11 @@ class StateTreatmentRecommendation(Document):
     def _is_pharmacist_only():
         roles = set(frappe.get_roles())
         return "Treatment Pharmacist" in roles and "System Manager" not in roles
+
+    @staticmethod
+    def _is_accountant_only():
+        roles = set(frappe.get_roles())
+        return "Treatment Accountant" in roles and not roles & ROLES_WITH_REQUEST_ACCESS
 
     def update_dose_summary(self):
         if self.status not in (APPROVED_STATUS, COMPLETED_STATUS):

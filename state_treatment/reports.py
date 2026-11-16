@@ -10,8 +10,8 @@ MANAGEMENT = ["General Manager", "System Manager"]
 REVIEW = ["General Manager", "Medical Reviewer", "Admin Reviewer", "System Manager"]
 
 REPORTS = [
-    {"name": "الطلبات حسب الحالة", "file": "requests_by_status.sql", "roles": REVIEW},
-    {"name": "المبالغ حسب الحالة", "file": "amounts_by_status.sql", "roles": MANAGEMENT},
+    {"name": "الطلبات حسب الحالة", "file": "requests_by_status.sql", "roles": REVIEW + ["Treatment Accountant"]},
+    {"name": "المبالغ حسب الحالة", "file": "amounts_by_status.sql", "roles": MANAGEMENT + ["Treatment Accountant"]},
     {"name": "الجرعات المستحقة", "file": "due_doses.sql",
      "roles": ["General Manager", "Treatment Pharmacist", "System Manager"]},
     {"name": "الإجراءات المعلقة", "file": "pending_procedures.sql",
